@@ -122,6 +122,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       },
     );
   }
+  
 
   void _onCheckIn() async {
     if (_formKey.currentState!.validate()) {
