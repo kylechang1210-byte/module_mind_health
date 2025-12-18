@@ -30,9 +30,7 @@ class MainMindTrackPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const DailyCheckInPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const DailyCheckInPage()),
                 );
               },
             ),
