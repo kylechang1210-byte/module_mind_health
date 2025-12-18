@@ -25,7 +25,7 @@ class _BreathingPageState extends State<BreathingPage> {
       _isRunning = true;
       _isPaused = false;
       if (_phase == "Ready") {
-        _phase = "Inhale";
+        _phase = "Breath In";
         _counter = 4;
       }
     });
@@ -37,14 +37,14 @@ class _BreathingPageState extends State<BreathingPage> {
         if (_counter > 1) {
           _counter--;
         } else {
-          if (_phase == "Inhale") {
+          if (_phase == "Breath In") {
             _phase = "Hold";
-            _counter = 4;
+            _counter = 3;
           } else if (_phase == "Hold") {
-            _phase = "Exhale";
-            _counter = 4;
-          } else if (_phase == "Exhale") {
-            _phase = "Inhale";
+            _phase = "Breath Out";
+            _counter = 3;
+          } else if (_phase == "Breath Out") {
+            _phase = "Breath In";
             _counter = 4;
           }
         }
@@ -65,7 +65,7 @@ class _BreathingPageState extends State<BreathingPage> {
       _isRunning = false;
       _isPaused = false;
       _phase = "Ready";
-      _counter = 4;
+      _counter = 3;
     });
     // Log session
     Provider.of<TherapyModel>(
