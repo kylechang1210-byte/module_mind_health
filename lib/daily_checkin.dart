@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_mindtrack.dart';
-import 'checkin_history.dart';
+import '../checkin_history.dart';
 
 class DailyCheckInPage extends StatefulWidget {
   const DailyCheckInPage({super.key});
@@ -122,7 +122,6 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       },
     );
   }
-  
 
   void _onCheckIn() async {
     if (_formKey.currentState!.validate()) {
