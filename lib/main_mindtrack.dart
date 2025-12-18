@@ -4,7 +4,6 @@ import 'daily_checkin.dart';
 
 class MainMindTrackPage extends StatelessWidget {
   const MainMindTrackPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +29,7 @@ class MainMindTrackPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const DailyCheckInPage(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const DailyCheckInPage()),
                 );
               },
             ),
