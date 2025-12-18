@@ -9,7 +9,7 @@ import 'movement_page.dart';
 void main() {
   runApp(const MyApp());
 }
-//
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -20,8 +20,7 @@ class MyApp extends StatelessWidget {
       create: (context) => TherapyModel(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: true),
-        // Defining routes as per Practical 2
+        theme: ThemeData(primarySwatch: Colors.deepPurple, useMaterial3: true),
         initialRoute: '/',
         routes: {
           '/': (context) => const TherapyPage(),
@@ -57,7 +56,6 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[],
         ),
       ),
-      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

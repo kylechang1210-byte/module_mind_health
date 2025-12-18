@@ -43,7 +43,7 @@ class TherapyPage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Tool 3: Movement
+            // Tool 3: Mindful Movement
             _buildTherapyCard(
               context: context,
               title: 'Mindful\nMovement',
@@ -68,7 +68,6 @@ class TherapyPage extends StatelessWidget {
         height: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          // Exact Gradient from teammate's code
           gradient: const LinearGradient(
             colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
             begin: Alignment.topLeft,
@@ -76,9 +75,9 @@ class TherapyPage extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xff7b3df0).withOpacity(0.3),
+              color: const Color(0xff7b3df0).withValues(alpha: 0.5),
               blurRadius: 8,
-              offset: const Offset(0, 4),
+              offset: const Offset(0, 5),
             ),
           ],
         ),

@@ -11,14 +11,13 @@ class BreathingPage extends StatefulWidget {
 }
 
 class _BreathingPageState extends State<BreathingPage> {
-  // --- Timer Logic ---
+  //Timer
   Timer? _timer;
   int _counter = 4;
   String _phase = "Ready";
   bool _isRunning = false;
   bool _isPaused = false;
 
-  // 🎨 Color Consistency: #7555FF
   final Color _brandColor = const Color(0xFF7555FF);
 
   void _startTimer() {
@@ -38,7 +37,6 @@ class _BreathingPageState extends State<BreathingPage> {
         if (_counter > 1) {
           _counter--;
         } else {
-          // Switch Phases
           if (_phase == "Inhale") {
             _phase = "Hold";
             _counter = 4;
@@ -70,7 +68,10 @@ class _BreathingPageState extends State<BreathingPage> {
       _counter = 4;
     });
     // Log session
-    Provider.of<TherapyModel>(context, listen: false).recordSession('Breathing Session');
+    Provider.of<TherapyModel>(
+      context,
+      listen: false,
+    ).recordSession('Breathing Session');
   }
 
   @override
@@ -84,7 +85,10 @@ class _BreathingPageState extends State<BreathingPage> {
     return Scaffold(
       backgroundColor: const Color(0xfff3f6fb),
       appBar: AppBar(
-        title: const Text('Breathing Exercise', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Breathing Exercise',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
@@ -100,13 +104,12 @@ class _BreathingPageState extends State<BreathingPage> {
         elevation: 0,
       ),
       body: Center(
-        // Ensures vertical centering for the whole page content
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center, // Vertical Center
             crossAxisAlignment: CrossAxisAlignment.center, // Horizontal Center
             children: [
-              // --- 1. The Breathing Circle ---
+              // Breathing Circle
               Container(
                 width: 260,
                 height: 260,
@@ -119,7 +122,7 @@ class _BreathingPageState extends State<BreathingPage> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: _brandColor.withOpacity(0.4),
+                      color: _brandColor.withValues(alpha: 0.8),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -151,17 +154,19 @@ class _BreathingPageState extends State<BreathingPage> {
 
               const SizedBox(height: 60),
 
-              // --- 2. Control Buttons ---
+              // Control Buttons
               // Main Action Button (Start/Pause/Resume)
               SizedBox(
-                width: 200, // Make button bigger
+                width: 200,
                 height: 60,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _brandColor, // Requested Color #7555FF
+                    backgroundColor: _brandColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22), // Requested Radius
+                      borderRadius: BorderRadius.circular(
+                        22,
+                      ),
                     ),
                     elevation: 5,
                   ),
@@ -176,7 +181,9 @@ class _BreathingPageState extends State<BreathingPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        _isRunning && !_isPaused ? Icons.pause : Icons.play_arrow,
+                        _isRunning && !_isPaused
+                            ? Icons.pause
+                            : Icons.play_arrow,
                         size: 28,
                       ),
                       const SizedBox(width: 10),
@@ -185,8 +192,8 @@ class _BreathingPageState extends State<BreathingPage> {
                             ? "PAUSE"
                             : (_isPaused ? "RESUME" : "START"),
                         style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
@@ -199,14 +206,14 @@ class _BreathingPageState extends State<BreathingPage> {
               // Reset Button (Only visible if running)
               if (_isRunning || _isPaused)
                 SizedBox(
-                  width: 200, // Matching width
+                  width: 200,
                   height: 55,
                   child: OutlinedButton(
                     style: OutlinedButton.styleFrom(
                       foregroundColor: _brandColor,
                       side: BorderSide(color: _brandColor, width: 2),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22), // Requested Radius
+                        borderRadius: BorderRadius.circular(22),
                       ),
                     ),
                     onPressed: _resetTimer,
@@ -215,7 +222,13 @@ class _BreathingPageState extends State<BreathingPage> {
                       children: [
                         Icon(Icons.refresh),
                         SizedBox(width: 8),
-                        Text("RESET", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(
+                          "RESET",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),

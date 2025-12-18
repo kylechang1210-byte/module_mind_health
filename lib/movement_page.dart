@@ -2,58 +2,82 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
 
-class MovementPage extends StatefulWidget {
+final Map<String, List<Map<String, dynamic>>> exerciseData = {
+  'Yoga': [
+    {
+      'title': 'Child\'s Pose',
+      'desc': 'Kneel, sit back on your heels, and fold forward. Rest your forehead on the floor.',
+      'icon': Icons.baby_changing_station
+    },
+    {
+      'title': 'Cat-Cow Flow',
+      'desc': 'On all fours, arch your back up (Cat), then dip your belly down (Cow).',
+      'icon': Icons.waves
+    },
+    {
+      'title': 'Tree Pose',
+      'desc': 'Stand on one leg. Place your other foot on your inner thigh. Hands at heart.',
+      'icon': Icons.nature_people
+    },
+  ],
+  'Pilates': [
+    {
+      'title': 'The Hundred',
+      'desc': 'Lie back, legs lifted. Pump your arms by your sides while breathing rhythmically.',
+      'icon': Icons.timer
+    },
+    {
+      'title': 'Leg Circles',
+      'desc': 'Lie flat. Lift one leg straight up and draw imaginary circles on the ceiling.',
+      'icon': Icons.loop
+    },
+    {
+      'title': 'Spine Stretch',
+      'desc': 'Sit tall with legs wide. Reach your hands forward, rounding your spine.',
+      'icon': Icons.accessibility_new
+    },
+  ],
+  'Walking': [
+    {
+      'title': 'Warm Up',
+      'desc': 'Walk at a comfortable, slow pace for 2 minutes to loosen muscles.',
+      'icon': Icons.directions_walk
+    },
+    {
+      'title': 'Power Walk',
+      'desc': 'Increase speed. Swing your arms and keep your head up.',
+      'icon': Icons.speed
+    },
+    {
+      'title': 'Mindful Cool Down',
+      'desc': 'Slow down. Focus on your breathing and the sounds around you.',
+      'icon': Icons.nature
+    },
+  ],
+  'Tai Chi': [
+    {
+      'title': 'Opening the Gate',
+      'desc': 'Stand tall, feet apart. Slowly float your arms up to shoulder height, then down.',
+      'icon': Icons.expand
+    },
+    {
+      'title': 'Brush Knee',
+      'desc': 'Step forward. Push one palm forward while the other hand "brushes" your knee.',
+      'icon': Icons.swipe
+    },
+    {
+      'title': 'Cloud Hands',
+      'desc': 'Shift weight side to side. Wave hands across your body like floating clouds.',
+      'icon': Icons.cloud
+    },
+  ],
+};
+
+// MINDFUL MOVEMENT MENU
+class MovementPage extends StatelessWidget {
   const MovementPage({super.key});
 
-  @override
-  State<MovementPage> createState() => _MovementPageState();
-}
-
-class _MovementPageState extends State<MovementPage> {
-  // --- Data: List of Stretches ---
-  final List<Map<String, dynamic>> _stretches = [
-    {
-      "title": "Neck Roll",
-      "desc": "Gently roll your head in a circle. 3 times each direction.",
-      "icon": Icons.face,
-    },
-    {
-      "title": "Shoulder Shrug",
-      "desc": "Lift your shoulders up to your ears, hold for 3s, then drop.",
-      "icon": Icons.accessibility_new,
-    },
-    {
-      "title": "Sky Reach",
-      "desc": "Interlock fingers and push your palms up towards the ceiling.",
-      "icon": Icons.pan_tool,
-    },
-  ];
-
-  int _currentStep = 0;
-  bool _isCompleted = false;
-
-  // Colors
-  final Color _purple = const Color(0xff7b3df0);
-  final Color _blue = const Color(0xff5fc3ff);
-
-  void _nextStep() {
-    setState(() {
-      if (_currentStep < _stretches.length - 1) {
-        _currentStep++;
-      } else {
-        _isCompleted = true;
-        // Save to History
-        Provider.of<TherapyModel>(context, listen: false).recordSession('Movement Session');
-      }
-    });
-  }
-
-  void _reset() {
-    setState(() {
-      _currentStep = 0;
-      _isCompleted = false;
-    });
-  }
+  final Color _brandColor = const Color(0xFF7555FF);
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +89,144 @@ class _MovementPageState extends State<MovementPage> {
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [_purple, _blue]),
+            gradient: LinearGradient(
+              colors: [_brandColor, const Color(0xff5fc3ff)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Text(
+              "Choose Your Practice",
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: _brandColor,
+              ),
+            ),
+            const SizedBox(height: 30),
+
+            // The Menu Buttons
+            _buildCategoryCard(context, "Yoga", Icons.self_improvement),
+            const SizedBox(height: 15),
+            _buildCategoryCard(context, "Pilates", Icons.fitness_center),
+            const SizedBox(height: 15),
+            _buildCategoryCard(context, "Walking", Icons.directions_walk),
+            const SizedBox(height: 15),
+            _buildCategoryCard(context, "Tai Chi", Icons.air),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryCard(BuildContext context, String title, IconData icon) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ExerciseGuidePage(
+              categoryName: title,
+              steps: exerciseData[title]!,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: _brandColor.withValues(alpha: 0.3),
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _brandColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: _brandColor, size: 28),
+            ),
+            const SizedBox(width: 20),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: _brandColor,
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.arrow_forward_ios, color: _brandColor, size: 20),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// THE GUIDELINE
+class ExerciseGuidePage extends StatefulWidget {
+  final String categoryName;
+  final List<Map<String, dynamic>> steps;
+
+  const ExerciseGuidePage({
+    super.key,
+    required this.categoryName,
+    required this.steps,
+  });
+
+  @override
+  State<ExerciseGuidePage> createState() => _ExerciseGuidePageState();
+}
+
+class _ExerciseGuidePageState extends State<ExerciseGuidePage> {
+  int _currentStep = 0;
+  bool _isCompleted = false;
+  final Color _brandColor = const Color(0xFF7555FF);
+
+  void _nextStep() {
+    setState(() {
+      if (_currentStep < widget.steps.length - 1) {
+        _currentStep++;
+      } else {
+        _isCompleted = true;
+        // Save to History using Provider
+        Provider.of<TherapyModel>(context, listen: false)
+            .recordSession('${widget.categoryName} Session');
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xfff3f6fb),
+      appBar: AppBar(
+        title: Text(widget.categoryName, style: const TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [_brandColor, const Color(0xff5fc3ff)],
+            ),
           ),
         ),
         foregroundColor: Colors.white,
@@ -78,132 +239,122 @@ class _MovementPageState extends State<MovementPage> {
     );
   }
 
-  // --- Screen 1: The Active Step ---
   Widget _buildStepScreen() {
-    final step = _stretches[_currentStep];
+    final step = widget.steps[_currentStep];
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        // Progress Indicator
-        Text(
-          "Step ${_currentStep + 1} of ${_stretches.length}",
-          style: TextStyle(fontSize: 18, color: Colors.grey[600], fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 30),
-
-        // Large Card for the Stretch
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(30),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: [
-              BoxShadow(
-                color: _purple.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Step ${_currentStep + 1} of ${widget.steps.length}",
+            style: TextStyle(fontSize: 18, color: Colors.grey[600], fontWeight: FontWeight.bold),
           ),
-          child: Column(
-            children: [
-              // Icon Circle
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(colors: [_purple.withOpacity(0.2), _blue.withOpacity(0.2)]),
-                ),
-                child: Icon(step['icon'], size: 80, color: _purple),
-              ),
-              const SizedBox(height: 20),
-              // Title
-              Text(
-                step['title'],
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: _purple,
-                ),
-              ),
-              const SizedBox(height: 15),
-              // Description
-              Text(
-                step['desc'],
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, color: Colors.black87),
-              ),
-            ],
-          ),
-        ),
+          const SizedBox(height: 30),
 
-        const SizedBox(height: 40),
-
-        // "Next" Button
-        SizedBox(
-          width: double.infinity,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              backgroundColor: Colors.transparent, // Transparent to show gradient
-              shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          // Instruction Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: _brandColor.withValues(alpha: 0.3),
+                  blurRadius: 20,
+                ),
+              ],
             ),
-            onPressed: _nextStep,
-            child: Ink(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [_purple, _blue]),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: Container(
-                alignment: Alignment.center,
-                constraints: const BoxConstraints(minHeight: 50),
-                child: const Text(
-                  "NEXT STRETCH",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+            child: Column(
+              children: [
+                // Icon in movement guideline page
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [_brandColor.withValues(alpha: 0.2), const Color(0xff5fc3ff).withValues(alpha: 0.2)],
+                    ),
+                  ),
+                  child: Icon(step['icon'], size: 80, color: _brandColor),
                 ),
+                const SizedBox(height: 20),
+                // Title
+                Text(
+                  step['title'],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: _brandColor),
+                ),
+                const SizedBox(height: 15),
+                // Description
+                Text(
+                  step['desc'],
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18, color: Colors.black87, height: 1.5),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 40),
+
+          // Next Button
+          SizedBox(
+            width: 200,
+            height: 60,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _brandColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                elevation: 5,
+              ),
+              onPressed: _nextStep,
+              child: const Text(
+                "NEXT STEP",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  // --- Screen 2: Completion ---
   Widget _buildCompletionScreen() {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.check_circle, size: 100, color: Colors.green),
+          const Icon(Icons.check_circle_rounded, size: 100, color: Colors.green),
           const SizedBox(height: 20),
           Text(
             "Session Complete!",
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _purple),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: _brandColor),
           ),
           const SizedBox(height: 10),
-          const Text("Great job taking care of your body.", style: TextStyle(fontSize: 16, color: Colors.grey)),
+          Text(
+            "You've finished your ${widget.categoryName} practice.",
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
+          ),
           const SizedBox(height: 40),
 
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _purple,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          SizedBox(
+            width: 200,
+            height: 60,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _brandColor,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text("FINISH", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
-            onPressed: () {
-              Navigator.pop(context); // Go back to Dashboard
-            },
-            child: const Text("FINISH", style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-          TextButton(
-            onPressed: _reset,
-            child: const Text("Do it again"),
-          )
         ],
       ),
     );

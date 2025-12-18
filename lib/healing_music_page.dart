@@ -2,21 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
 
-class HealingMusicPage extends StatelessWidget {
+class HealingMusicPage extends StatefulWidget {
   const HealingMusicPage({super.key});
+
+  @override
+  State<HealingMusicPage> createState() => _HealingMusicPageState();
+}
+
+class _HealingMusicPageState extends State<HealingMusicPage> {
+  // Logic to track which song is playing
+  int _playingIndex = -1;
+  final Color _mainColor = const Color(0xFF7555FF);
+
+  final List<Map<String, dynamic>> _songs = [
+    {"title": "Rainy Mood", "desc": "Calming rain sounds", "icon": Icons.water_drop},
+    {"title": "Forest Walk", "desc": "Birds and nature", "icon": Icons.forest},
+    {"title": "Deep Focus", "desc": "White noise for study", "icon": Icons.headphones},
+    {"title": "Ocean Waves", "desc": "Gentle beach tides", "icon": Icons.waves},
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff3f6fb), // Matching Main Page Background
+      backgroundColor: const Color(0xfff3f6fb),
       appBar: AppBar(
         title: const Text('Healing Music', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xff7b3df0), Color(0xff5fc3ff)], // Matching Gradient
+              colors: [_mainColor, const Color(0xff5fc3ff)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -26,99 +42,112 @@ class HealingMusicPage extends StatelessWidget {
         elevation: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            const SizedBox(height: 10),
+            Text(
               "Select a Sound",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xff7b3df0), // Matching Title Color
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _mainColor),
             ),
             const SizedBox(height: 20),
-
-            // --- Track 1 ---
-            _buildMusicCard(context, "Rainy Mood", "Calming rain sounds", Icons.water_drop),
-            const SizedBox(height: 15),
-
-            // --- Track 2 ---
-            _buildMusicCard(context, "Forest Walk", "Birds and nature", Icons.forest),
-            const SizedBox(height: 15),
-
-            // --- Track 3 ---
-            _buildMusicCard(context, "Deep Focus", "White noise for study", Icons.headphones),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _songs.length,
+                itemBuilder: (context, index) {
+                  return _buildMusicCard(index);
+                },
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  // Helper widget to create cards that look like your Main Page
-  Widget _buildMusicCard(BuildContext context, String title, String subtitle, IconData icon) {
-    return GestureDetector(
-      onTap: () {
-        // Logic: Record the session
-        Provider.of<TherapyModel>(context, listen: false).recordSession('Music: $title');
+  Widget _buildMusicCard(int index) {
+    bool isPlaying = _playingIndex == index;
+    String title = _songs[index]['title'];
+    String subtitle = _songs[index]['desc'];
+    IconData icon = _songs[index]['icon'];
 
-        // Visual Feedback
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Now Playing: $title')),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xff7b3df0).withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // Icon Container with Gradient
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 15),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        // Add a border if playing, otherwise keep it clean
+        border: isPlaying ? Border.all(color: _mainColor, width: 3) : null,
+        boxShadow: [
+          BoxShadow(
+            color: _mainColor.withValues(alpha: 0.5),
+            blurRadius: 10,
+            offset: const Offset(0,5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Icon Container
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                colors: isPlaying
+                    ? [_mainColor, const Color(0xff5fc3ff)]
+                    : [Colors.grey.shade300, Colors.grey.shade400],
               ),
-              child: Icon(icon, color: Colors.white, size: 24),
             ),
-            const SizedBox(width: 20),
-            // Text Info
-            Column(
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+          const SizedBox(width: 15),
+
+          // Text Info
+          Expanded(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xff333333),
+                    color: isPlaying ? _mainColor : const Color(0xff333333),
                   ),
                 ),
-                Text(
-                  subtitle,
-                  style: TextStyle(color: Colors.grey[600]),
-                ),
+                Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
-            const Spacer(),
-            const Icon(Icons.play_circle_fill, color: Color(0xff7b3df0), size: 30),
-          ],
-        ),
+          ),
+
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Play Button
+              IconButton(
+                icon: const Icon(Icons.play_circle_fill),
+                color: isPlaying ? Colors.grey : _mainColor,
+                iconSize: 32,
+                onPressed: () {
+                  setState(() => _playingIndex = index);
+                  Provider.of<TherapyModel>(context, listen: false).recordSession('Music: $title');
+                },
+              ),
+              // Pause Button
+              IconButton(
+                icon: const Icon(Icons.pause_circle_filled),
+                color: isPlaying ? _mainColor : Colors.grey[300],
+                iconSize: 32,
+                onPressed: () {
+                  setState(() => _playingIndex = -1);
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
