@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:module_mind_health/main_mindtrack.dart';
+import 'package:module_mind_health/jj_mindtrack/main_mindtrack.dart';
 void main() {
   runApp(const MyApp());
 }
