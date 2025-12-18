@@ -4,7 +4,6 @@ import 'daily_checkin.dart';
 
 class MainMindTrackPage extends StatelessWidget {
   const MainMindTrackPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
