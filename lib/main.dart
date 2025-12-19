@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:module_mind_health/therapy_admin.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
 import 'therapy_page.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
           '/healing_music': (context) => const HealingMusicPage(),
           '/breathing': (context) => const BreathingPage(),
           '/movement': (context) => const MovementPage(),
+          '/admin': (context) => const TherapyAdmin(),
         },
       ),
     );

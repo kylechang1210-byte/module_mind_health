@@ -50,6 +50,16 @@ class TherapyPage extends StatelessWidget {
               icon: Icons.accessibility_new_rounded,
               onTap: () => Navigator.pushNamed(context, '/movement'),
             ),
+
+
+            // Therapy Management (Admin, for testing purpose)
+            const SizedBox(height: 16),
+            _buildTherapyCard(
+              context: context,
+              title: 'Admin\nManagement',
+              icon: Icons.admin_panel_settings_rounded,
+              onTap: () => Navigator.pushNamed(context, '/admin'),
+            ),
           ],
         ),
       ),
