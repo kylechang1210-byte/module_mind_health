@@ -1,77 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
-
-final Map<String, List<Map<String, dynamic>>> exerciseData = {
-  'Yoga': [
-    {
-      'title': 'Child\'s Pose',
-      'desc': 'Kneel, sit back on your heels, and fold forward. Rest your forehead on the floor.',
-      'icon': Icons.baby_changing_station
-    },
-    {
-      'title': 'Cat-Cow Flow',
-      'desc': 'On all fours, arch your back up (Cat), then dip your belly down (Cow).',
-      'icon': Icons.waves
-    },
-    {
-      'title': 'Tree Pose',
-      'desc': 'Stand on one leg. Place your other foot on your inner thigh. Hands at heart.',
-      'icon': Icons.nature_people
-    },
-  ],
-  'Pilates': [
-    {
-      'title': 'The Hundred',
-      'desc': 'Lie back, legs lifted. Pump your arms by your sides while breathing rhythmically.',
-      'icon': Icons.timer
-    },
-    {
-      'title': 'Leg Circles',
-      'desc': 'Lie flat. Lift one leg straight up and draw imaginary circles on the ceiling.',
-      'icon': Icons.loop
-    },
-    {
-      'title': 'Spine Stretch',
-      'desc': 'Sit tall with legs wide. Reach your hands forward, rounding your spine.',
-      'icon': Icons.accessibility_new
-    },
-  ],
-  'Walking': [
-    {
-      'title': 'Warm Up',
-      'desc': 'Walk at a comfortable, slow pace for 2 minutes to loosen muscles.',
-      'icon': Icons.directions_walk
-    },
-    {
-      'title': 'Power Walk',
-      'desc': 'Increase speed. Swing your arms and keep your head up.',
-      'icon': Icons.speed
-    },
-    {
-      'title': 'Mindful Cool Down',
-      'desc': 'Slow down. Focus on your breathing and the sounds around you.',
-      'icon': Icons.nature
-    },
-  ],
-  'Tai Chi': [
-    {
-      'title': 'Opening the Gate',
-      'desc': 'Stand tall, feet apart. Slowly float your arms up to shoulder height, then down.',
-      'icon': Icons.expand
-    },
-    {
-      'title': 'Brush Knee',
-      'desc': 'Step forward. Push one palm forward while the other hand "brushes" your knee.',
-      'icon': Icons.swipe
-    },
-    {
-      'title': 'Cloud Hands',
-      'desc': 'Shift weight side to side. Wave hands across your body like floating clouds.',
-      'icon': Icons.cloud
-    },
-  ],
-};
+import 'database_mindtrack.dart';
 
 // MINDFUL MOVEMENT MENU
 class MovementPage extends StatelessWidget {
@@ -130,13 +60,17 @@ class MovementPage extends StatelessWidget {
 
   Widget _buildCategoryCard(BuildContext context, String title, IconData icon) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        // Fetch data from Database dynamically
+        final steps = await DatabaseMindTrack.instance.getExercises(title);
+
+        // Navigate passing the DB data
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ExerciseGuidePage(
               categoryName: title,
-              steps: exerciseData[title]!,
+              steps: steps,
             ),
           ),
         );
@@ -240,7 +174,14 @@ class _ExerciseGuidePageState extends State<ExerciseGuidePage> {
   }
 
   Widget _buildStepScreen() {
+    if (widget.steps.isEmpty) {
+      return const Center(child: Text("No exercises found for this category."));
+    }
+
     final step = widget.steps[_currentStep];
+
+    // Convert DB iconCode to IconData
+    IconData icon = IconData(step['iconCode'], fontFamily: 'MaterialIcons');
 
     return Center(
       child: Column(
@@ -277,7 +218,7 @@ class _ExerciseGuidePageState extends State<ExerciseGuidePage> {
                       colors: [_brandColor.withValues(alpha: 0.2), const Color(0xff5fc3ff).withValues(alpha: 0.2)],
                     ),
                   ),
-                  child: Icon(step['icon'], size: 80, color: _brandColor),
+                  child: Icon(icon, size: 80, color: _brandColor),
                 ),
                 const SizedBox(height: 20),
                 // Title
@@ -289,7 +230,7 @@ class _ExerciseGuidePageState extends State<ExerciseGuidePage> {
                 const SizedBox(height: 15),
                 // Description
                 Text(
-                  step['desc'],
+                  step['description'], // Note: DB uses 'description', Map used 'desc'
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 18, color: Colors.black87, height: 1.5),
                 ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
+import 'database_mindtrack.dart'; // Import Database
 
 class HealingMusicPage extends StatefulWidget {
   const HealingMusicPage({super.key});
@@ -10,16 +11,9 @@ class HealingMusicPage extends StatefulWidget {
 }
 
 class _HealingMusicPageState extends State<HealingMusicPage> {
-  // Logic to track which song is playing
-  int _playingIndex = -1;
+  // Logic to track which song is playing using ID
+  int _playingId = -1;
   final Color _mainColor = const Color(0xFF7555FF);
-
-  final List<Map<String, dynamic>> _songs = [
-    {"title": "Rainy Mood", "desc": "Calming rain sounds", "icon": Icons.water_drop},
-    {"title": "Forest Walk", "desc": "Birds and nature", "icon": Icons.forest},
-    {"title": "Deep Focus", "desc": "White noise for study", "icon": Icons.headphones},
-    {"title": "Ocean Waves", "desc": "Gentle beach tides", "icon": Icons.waves},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +46,27 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _mainColor),
             ),
             const SizedBox(height: 20),
+
+            // Replaced ListView with FutureBuilder to read from DB
             Expanded(
-              child: ListView.builder(
-                itemCount: _songs.length,
-                itemBuilder: (context, index) {
-                  return _buildMusicCard(index);
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: DatabaseMindTrack.instance.getAllMusic(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(child: Text("No music found in database."));
+                  }
+
+                  final songs = snapshot.data!;
+
+                  return ListView.builder(
+                    itemCount: songs.length,
+                    itemBuilder: (context, index) {
+                      return _buildMusicCard(songs[index]);
+                    },
+                  );
                 },
               ),
             ),
@@ -66,11 +76,15 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
     );
   }
 
-  Widget _buildMusicCard(int index) {
-    bool isPlaying = _playingIndex == index;
-    String title = _songs[index]['title'];
-    String subtitle = _songs[index]['desc'];
-    IconData icon = _songs[index]['icon'];
+  Widget _buildMusicCard(Map<String, dynamic> song) {
+    int id = song['id'];
+    String title = song['title'];
+    String subtitle = song['description'];
+
+    // Convert integer code back to IconData
+    IconData icon = IconData(song['iconCode'], fontFamily: 'MaterialIcons');
+
+    bool isPlaying = _playingId == id;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
@@ -132,7 +146,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
                 color: isPlaying ? Colors.grey : _mainColor,
                 iconSize: 32,
                 onPressed: () {
-                  setState(() => _playingIndex = index);
+                  setState(() => _playingId = id);
                   Provider.of<TherapyModel>(context, listen: false).recordSession('Music: $title');
                 },
               ),
@@ -142,7 +156,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
                 color: isPlaying ? _mainColor : Colors.grey[300],
                 iconSize: 32,
                 onPressed: () {
-                  setState(() => _playingIndex = -1);
+                  setState(() => _playingId = -1);
                 },
               ),
             ],
