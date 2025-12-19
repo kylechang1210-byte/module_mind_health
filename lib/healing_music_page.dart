@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
-import 'database_mindtrack.dart'; // Import Database
+import 'database_mindtrack.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class HealingMusicPage extends StatefulWidget {
