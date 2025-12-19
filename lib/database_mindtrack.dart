@@ -38,6 +38,13 @@ class DatabaseMindTrack {
     // Music Table
     await db.execute(
       ''
+          'CREATE TABLE music('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'title TEXT NOT NULL,'
+          'description TEXT NOT BULL,'
+          'iconCode INTEGER NOT NULL,'
+          'audioPath TEXT NOT NULL'
+          ')',
       'CREATE TABLE music('
       'id INTEGER PRIMARY KEY AUTOINCREMENT,'
       'title TEXT NOT NULL,'
@@ -50,6 +57,13 @@ class DatabaseMindTrack {
     // Mindful Movement Table
     await db.execute(
       ''
+          'CREATE TABLE exercises('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'category TEXT NOT NULL,'
+          'title TEXT NOT NULL,'
+          'description TEXT NOT NULL,'
+          'iconCode INTEGER NOT NULL'
+          ')',
       'CREATE TABLE exercises('
       'id INTEGER PRIMARY KEY AUTOINCREMENT,'
       'category TEXT NOT NULL,'
@@ -89,6 +103,7 @@ class DatabaseMindTrack {
         'title': 'Ocean Waves',
         'description': 'Gentle beach tides',
         'iconCode': 0xe6c3,
+        //'audioPath': 'assets/audio/ocean.mp3',
         'audioPath': 'assets/audio/ocean.mp3',
       },
     ];
@@ -269,4 +284,5 @@ class DatabaseMindTrack {
     final database = await db;
     return database.delete('exercises', where: 'id = ?', whereArgs: [id]);
   }
+}
 }
