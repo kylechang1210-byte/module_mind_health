@@ -270,3 +270,4 @@ class DatabaseMindTrack {
     return database.delete('exercises', where: 'id = ?', whereArgs: [id]);
   }
 }
+
