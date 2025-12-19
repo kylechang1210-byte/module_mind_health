@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
-import 'database_mindtrack.dart'; // Import Database
+import 'database_mindtrack.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HealingMusicPage extends StatefulWidget {
   const HealingMusicPage({super.key});
@@ -14,6 +15,42 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
   // Logic to track which song is playing using ID
   int _playingId = -1;
   final Color _mainColor = const Color(0xFF7555FF);
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void dispose() {
+    _audioPlayer.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  // Function to handle the music logic
+  void _toggleMusic(int id, String path) async {
+    print("Attempting to play: $path");
+
+    try {
+      if (_playingId == id) {
+        await _audioPlayer.stop();
+        setState(() => _playingId = -1);
+      } else {
+        await _audioPlayer.stop();
+
+        // Remove 'assets/' prefix for AssetSource
+        String cleanPath = path.replaceFirst('assets/', '');
+
+        // This is the correct way for audioplayers 6.x
+        await _audioPlayer.play(AssetSource(cleanPath));
+
+        setState(() => _playingId = id);
+      }
+    } catch (e) {
+      print("AUDIO ERROR: $e");
+      // This will pop up a message if the file is missing
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,11 +179,11 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
             children: [
               // Play Button
               IconButton(
-                icon: const Icon(Icons.play_circle_fill),
+                icon: Icon(isPlaying ? Icons.stop_circle : Icons.play_circle_fill), // Changed icon to show stop when playing
                 color: isPlaying ? Colors.grey : _mainColor,
                 iconSize: 32,
                 onPressed: () {
-                  setState(() => _playingId = id);
+                  _toggleMusic(id, song['audioPath']);
                   Provider.of<TherapyModel>(context, listen: false).recordSession('Music: $title');
                 },
               ),

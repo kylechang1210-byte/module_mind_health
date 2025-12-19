@@ -41,7 +41,7 @@ class DatabaseMindTrack {
           'CREATE TABLE music('
           'id INTEGER PRIMARY KEY AUTOINCREMENT,'
           'title TEXT NOT NULL,'
-          'description TEXT NOT BULL,'
+          'description TEXT NOT NULL,'
           'iconCode INTEGER NOT NULL,'
           'audioPath TEXT NOT NULL'
           ')',
@@ -83,13 +83,12 @@ class DatabaseMindTrack {
         'title': 'Deep Focus',
         'description': 'White noise for study',
         'iconCode': 0xf01e,
-        'audioPath': 'assets/audio/white_noise.mp3',
+        'audioPath': 'assets/audio/focus.mp3',
       },
       {
         'title': 'Ocean Waves',
         'description': 'Gentle beach tides',
         'iconCode': 0xe6c3,
-        //'audioPath': 'assets/audio/ocean.mp3',
         'audioPath': 'assets/audio/ocean.mp3',
       },
     ];
