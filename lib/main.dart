@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'therapy_model.dart';
-import 'therapy_page.dart';
-import 'healing_music_page.dart';
-import 'breathing_page.dart';
-import 'movement_page.dart';
 
 import 'package:module_mind_health/main_mindtrack.dart';
 void main() {
@@ -17,19 +12,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // initialize the provider exactly
-    return ChangeNotifierProvider(
-      create: (context) => TherapyModel(),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.deepPurple, useMaterial3: true),
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const TherapyPage(),
-          '/healing_music': (context) => const HealingMusicPage(),
-          '/breathing': (context) => const BreathingPage(),
-          '/movement': (context) => const MovementPage(),
-        },
-      ),
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -54,19 +36,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[],
-
-
   @override
   Widget build(BuildContext context) {
 
