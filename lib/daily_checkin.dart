@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'database_mindtrack.dart';
-import '../checkin_history.dart';
+import 'checkin_history.dart';
+import 'supabase_connection.dart';
+
 
 class DailyCheckInPage extends StatefulWidget {
   const DailyCheckInPage({super.key});
 
+
   @override
   State<DailyCheckInPage> createState() => _DailyCheckInPageState();
 }
+
 
 class _DailyCheckInPageState extends State<DailyCheckInPage> {
   final _formKey = GlobalKey<FormState>();
@@ -15,6 +19,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   final _notesCtrl = TextEditingController();
   int selectedMood = 4;
   double _selectedRange = 0.75; // 0.0 – 1.0
+
 
   final List<String> feelings = [
     'Calm', 'Content', 'Excited',
@@ -24,6 +29,28 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   ];
   final Set<String> selectedFeelings = {};
 
+
+  //Supabase
+  Future<void> _saveToSupabase({
+    required int mood,
+    required int score,
+    required String feelings,
+    required String notes,
+  }) async {
+    final supabase = SupabaseConnection.client;
+
+
+    await supabase.from('checkins').insert({
+      // id: auto
+      // date: has default now() in Supabase, so you can omit it
+      'mood': mood.toString(),  // your column is varchar
+      'score': score,           // int8
+      'feelings': feelings,       // varchar
+      'notes': notes,           // varchar
+    });
+  }
+
+
   @override
   void dispose() {
     _customFeelingCtrl.dispose();
@@ -32,9 +59,12 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   void _onEmojiTap(int moodIndex) {
     setState(() {
       selectedMood = moodIndex;
+
 
       switch (moodIndex) {
         case 0: _selectedRange = 0.1; break;
@@ -46,8 +76,10 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     });
   }
 
+
   String getRangeLabel() {
     final percent = (_selectedRange * 100).round();
+
 
     if (percent <= 20) {
       return '0% - 20%';
@@ -63,11 +95,15 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   void _onSliderChanged(double value) {
     setState(() {
       _selectedRange = value;
 
+
       final percent = (_selectedRange * 100).round();
+
 
       if (percent <= 20) {
         selectedMood = 0; // Terrible
@@ -83,31 +119,32 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     });
   }
 
+
   void myAlertDialogSuccessCheckIn(){
     AlertDialog successAlertDialog = AlertDialog(
       title: const Text('Success'),
       content: Text('Successfully Check In',
       ),
-    actions: [
-      TextButton(
-          onPressed: (){
-        Navigator.pop(context);
-      }, child: Text('OK'))
-    ],
+      actions: [
+        TextButton(
+            onPressed: (){
+              Navigator.pop(context);
+            }, child: Text('OK'))
+      ],
     );
     showDialog(
-        context: context,
-        builder: (BuildContext context){
-      return successAlertDialog;
-    },
+      context: context,
+      builder: (BuildContext context){
+        return successAlertDialog;
+      },
     );
   }
 
-  void myAlertDialogErrorCheckIn(){
+
+  void myAlertDialogErrorCheckIn(String message){
     AlertDialog errorAlertDialog = AlertDialog(
       title: const Text('Error'),
-      content: Text('Error to saving please fill all the field',
-      ),
+      content: Text(message),
       actions: [
         TextButton(
             onPressed: (){
@@ -123,9 +160,11 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   void _onCheckIn() async {
     if (_formKey.currentState!.validate()) {
       final score = (_selectedRange * 100).round();
+
 
       final List<String> all = selectedFeelings.toList();
       final custom = _customFeelingCtrl.text.trim();
@@ -134,6 +173,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       }
       final feelingsText = all.join(', ');
 
+
       try {
         await DatabaseMindTrack.instance.insertCheckIn(
           date: DateTime.now().toIso8601String().substring(0, 10),
@@ -141,10 +181,23 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
           score: score,
           feelings: feelingsText,
           notes: _notesCtrl.text.trim(),
+
+
         );
+        await _saveToSupabase(
+          mood: selectedMood,
+          score: score,
+          feelings: feelingsText,
+          notes: _notesCtrl.text.trim(),
+        );
+
+
+
 
         if (!mounted) return;
         myAlertDialogSuccessCheckIn();
+
+
 
 
         _customFeelingCtrl.clear();
@@ -153,11 +206,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
         setState(() {});
       } catch (e) {
         if (!mounted) return;
-        myAlertDialogErrorCheckIn();
+        myAlertDialogErrorCheckIn('Failed to save: $e');
+
 
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -207,6 +262,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   Widget _buildTitle() {
     return Text.rich(
       TextSpan(
@@ -232,9 +288,11 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   Widget _buildMoodRow() {
     final moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
     final faces = ['😫', '😕', '😐', '🙂', '😄'];
+
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -279,9 +337,11 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   Widget _buildRangePill() {
     final min = (_selectedRange * 100).round();
     const max = 100;
+
 
     return Column(
       children: [
@@ -318,6 +378,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       ],
     );
   }
+
 
   Widget _buildFeelingCard() {
     return Container(
@@ -386,6 +447,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   Widget _buildCustomFeelingField() {
     return TextFormField(
       controller: _customFeelingCtrl,
@@ -411,6 +473,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     );
   }
 
+
   Widget _buildNotesField() {
     return TextFormField(
       controller: _notesCtrl,
@@ -430,6 +493,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       ),
     );
   }
+
 
   Widget _buildCheckInButton() {
     return SizedBox(
@@ -451,6 +515,7 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             color: Colors.white,
           ),
         ),
+
 
       ),
     );

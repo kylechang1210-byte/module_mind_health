@@ -1,57 +1,58 @@
 import 'package:flutter/material.dart';
-import 'database_mindtrack.dart';
-import 'supabase_connection.dart';
-import 'checkin_detail.dart';
 import 'package:intl/intl.dart';
+import 'database_mindtrack.dart';
+import 'journal_detail.dart';
+import 'supabase_connection.dart';
 
-class CheckInHistoryPage extends StatefulWidget {
-  const CheckInHistoryPage({super.key});
-
-  @override
-  State<CheckInHistoryPage> createState() => _CheckInHistoryPageState();
-}
-
-String formatSupabaseDate(String raw) {
+// date helper (or import from a shared file)
+String formatJournalDate(String raw) {
   try {
-    final dt = DateTime.parse(raw);               // parses 2025-12-19 14:44:23.72651+00
-    final local = dt.toLocal();                   // convert from UTC to device timezone
-    return DateFormat('yyyy-MM-dd').format(local); // or any pattern you want
+    final dt = DateTime.parse(raw);
+    final local = dt.toLocal();
+    return DateFormat('yyyy-MM-dd').format(local);
   } catch (_) {
-    return raw; // fallback
+    return raw;
   }
 }
 
-class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
-  List<Map<String, dynamic>> items = [];
+
+
+class JournalHistoryPage extends StatefulWidget {
+  const JournalHistoryPage({super.key});
+
+  @override
+  State<JournalHistoryPage> createState() => _JournalHistoryPageState();
+}
+
+class _JournalHistoryPageState extends State<JournalHistoryPage> {
+  List<Map<String, dynamic>> _journals = [];
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadHistory();
+    _loadJournals();
   }
 
-  // ================== LOAD FROM SQLITE + SUPABASE ==================
-
-  Future<void> _loadHistory() async {
+  Future<void> _loadJournals() async {
     setState(() => _isLoading = true);
 
     try {
-      // 1. Local SQLite
-      final localRows = await DatabaseMindTrack.instance.getAllCheckIns();
+      // 1) Local SQLite
+      final localRows = await DatabaseMindTrack.instance.getAllJournals();
       final local = localRows
           .map((row) => {
         ...row,
-        'source': 'local', // mark source
+        'source': 'local',
       })
           .toList();
 
-      // 2. Remote Supabase (safe to wrap in try so offline still works)
+      // 2) Remote Supabase
       List<Map<String, dynamic>> remote = [];
       try {
         final supabase = SupabaseConnection.client;
         final data = await supabase
-            .from('checkins')
+            .from('journals')
             .select()
             .order('date', ascending: false);
 
@@ -59,59 +60,72 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
             .map<Map<String, dynamic>>((row) => {
           'id': row['id'],
           'date': row['date'],
-          'mood': int.tryParse('${row['mood']}') ?? 0,
-          'score': row['score'] ?? 0,
-          'feelings': row['feelings'] ?? '',
-          'notes': row['notes'] ?? '',
+          'title': row['title'] ?? '',
+          'mood': row['mood'] ?? '',
+          'content': row['content'] ?? '',
           'source': 'supabase',
         })
             .toList();
       } catch (_) {
-        // if Supabase fails (offline), just show local
+        // if remote fails (offline), just keep local
       }
 
-      // 3. Merge. Simple concat; you can add smarter de-dup later.
-      final merged = <Map<String, dynamic>>[
-        ...local,
-        ...remote,
-      ];
+      // 3) Merge + de‑duplicate by id, prefer Supabase over local
+      final Map<String, Map<String, dynamic>> uniqueById = {};
+
+      for (final row in local) {
+        final idKey = '${row['id']}';
+        uniqueById[idKey] = row; // local baseline
+      }
+
+      for (final row in remote) {
+        final idKey = '${row['id']}';
+        // if remote exists, overwrite local
+        uniqueById[idKey] = row;
+      }
+
+      final merged = uniqueById.values.toList()
+        ..sort((a, b) {
+          // optional: sort by date desc after merge
+          final ad = (a['date'] ?? '').toString();
+          final bd = (b['date'] ?? '').toString();
+          return bd.compareTo(ad);
+        });
 
       if (!mounted) return;
-      setState(() {
-        items = merged;
-      });
+      setState(() => _journals = merged);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load check-ins: $e')),
+        SnackBar(content: Text('Failed to load journals: $e')),
       );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // ================== DELETE FROM BOTH ==================
 
-  Future<void> _deleteCheckIn(Map<String, dynamic> row) async {
+  Future<void> _deleteJournal(Map<String, dynamic> row) async {
     final int id = row['id'] as int;
 
-    // Delete local
+    // local
     try {
-      await DatabaseMindTrack.instance.deleteCheckIn(id);
+      await DatabaseMindTrack.instance.deleteJournal(id);
     } catch (_) {}
 
-    // Delete remote (ignore errors if offline)
+    // remote
     try {
       final supabase = SupabaseConnection.client;
-      await supabase.from('checkins').delete().eq('id', id);
+      await supabase.from('journals').delete().eq('id', id);
     } catch (_) {}
 
-    await _loadHistory();
+    await _loadJournals();
   }
 
-  void myAlertDialogDeleteCheckIn(BuildContext context, Map<String, dynamic> row) {
+  void myAlertDialogDeleteJournal(
+      BuildContext context, Map<String, dynamic> row) {
     AlertDialog deleteDialog = AlertDialog(
-      title: const Text('Delete Check-In'),
+      title: const Text('Delete Journal'),
       content: const Text('Are you sure you want to delete this entry?'),
       actions: [
         TextButton(
@@ -123,7 +137,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
         TextButton(
           onPressed: () async {
             Navigator.pop(context);
-            await _deleteCheckIn(row);
+            await _deleteJournal(row);
           },
           child: const Text('Delete'),
         ),
@@ -132,13 +146,9 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return deleteDialog;
-      },
+      builder: (BuildContext context) => deleteDialog,
     );
   }
-
-  // ================== UI ==================
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +158,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
         backgroundColor: const Color(0xFFF4F7FB),
         elevation: 0,
         title: const Text(
-          'Check-In History',
+          'Journal History',
           style: TextStyle(
             color: Color(0xFF6D5DF6),
             fontWeight: FontWeight.bold,
@@ -157,36 +167,31 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : items.isEmpty
-          ? const Center(child: Text('No check-ins yet'))
+          : _journals.isEmpty
+          ? const Center(child: Text('No journal entries yet.'))
           : RefreshIndicator(
-        onRefresh: _loadHistory,
+        onRefresh: _loadJournals,
         child: ListView.builder(
           padding: const EdgeInsets.symmetric(
               horizontal: 16, vertical: 12),
-          itemCount: items.length,
+          itemCount: _journals.length,
           itemBuilder: (context, index) {
-            final row = items[index];
-            return _buildCheckInCard(context, row);
+            final data = _journals[index];
+            return _buildJournalCard(context, data);
           },
         ),
       ),
     );
   }
 
-  Widget _buildCheckInCard(
-      BuildContext context, Map<String, dynamic> row) {
-    final rawDate = row['date'] ?? '';
-    final displayDate = formatSupabaseDate(rawDate);
-    final int score = row['score'] ?? 0;
-    final String feelings = row['feelings'] ?? '';
-    final int moodIndex = row['mood'] ?? 0;
-    final String source = row['source'] as String? ?? 'local';
+  Widget _buildJournalCard(
+      BuildContext context, Map<String, dynamic> data) {
+    final String rawDate = data['date'] ?? '';
+    final String date = formatJournalDate(rawDate);
 
-    const moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
-    final moodText = (moodIndex >= 0 && moodIndex < moods.length)
-        ? moods[moodIndex]
-        : moodIndex.toString();
+    final String title = data['title'] ?? '';
+    final String mood = data['mood'] ?? '';
+    final String source = data['source'] as String? ?? 'local';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -194,7 +199,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: const LinearGradient(
-          colors: [Color(0xFF6D5DF6), Color(0xFF7BC5FF)],
+          colors: [Color(0xFF6D5DF6), Color(0xFFFA7AE5)],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -207,7 +212,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                displayDate,
+                date,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -223,7 +228,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      '$moodText  •  $score%',
+                      mood,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
@@ -233,7 +238,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
                     onPressed: () =>
-                        myAlertDialogDeleteCheckIn(context, row),
+                        myAlertDialogDeleteJournal(context, data),
                   ),
                 ],
               ),
@@ -241,9 +246,9 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
           ),
           const SizedBox(height: 6),
 
-          // feelings preview
+          // title preview
           Text(
-            feelings,
+            '“$title”',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -265,7 +270,6 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
 
           const SizedBox(height: 8),
 
-          // Detail button
           Align(
             alignment: Alignment.bottomRight,
             child: TextButton(
@@ -273,7 +277,7 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => CheckInDetailPage(data: row),
+                    builder: (_) => JournalDetailPage(data: data),
                   ),
                 );
               },

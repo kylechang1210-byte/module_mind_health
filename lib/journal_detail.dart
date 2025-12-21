@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-String formatCheckInDate(String raw) {
+// Helper to format both SQLite dates ("2025-12-21")
+// and Supabase timestamptz ("2025-12-19 14:44:23.72651+00").
+String formatJournalDate(String raw) {
   try {
     final dt = DateTime.parse(raw);
     final local = dt.toLocal();
@@ -11,24 +13,19 @@ String formatCheckInDate(String raw) {
   }
 }
 
-class CheckInDetailPage extends StatelessWidget {
+class JournalDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
 
-  const CheckInDetailPage({super.key, required this.data});
+  const JournalDetailPage({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final String rawDate = data['date'] ?? '';
-    final String date = formatCheckInDate(rawDate);
+    final String date = formatJournalDate(rawDate);
 
-    final int mood = data['mood'] ?? 0;
-    final int score = data['score'] ?? 0;
-    final String feelings = data['feelings'] ?? '';
-    final String notes = data['notes'] ?? '';
-
-    const moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
-    final String moodText =
-    (mood >= 0 && mood < moods.length) ? moods[mood] : mood.toString();
+    final String title = data['title'] ?? '';
+    final String mood = data['mood'] ?? '';
+    final String content = data['content'] ?? '';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
@@ -36,7 +33,7 @@ class CheckInDetailPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF4F7FB),
         elevation: 0,
         title: const Text(
-          'Check-In Detail',
+          'Journal Detail',
           style: TextStyle(
             color: Color(0xFF6D5DF6),
             fontWeight: FontWeight.bold,
@@ -48,14 +45,14 @@ class CheckInDetailPage extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Column(
             children: [
-              // Top card with gradient, similar to your history modules
+              // Top gradient card (date + mood + title preview)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   gradient: const LinearGradient(
-                    colors: [Color(0xFF6D5DF6), Color(0xFF7BC5FF)],
+                    colors: [Color(0xFF6D5DF6), Color(0xFFFA7AE5)],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
                   ),
@@ -70,7 +67,7 @@ class CheckInDetailPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Date + mood + score
+                    // Date + mood
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -82,30 +79,34 @@ class CheckInDetailPage extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            '$moodText  •  $score%',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                        if (mood.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.25),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              mood,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    // Feelings
+                    // Title
                     Text(
-                      feelings.isEmpty ? 'No feelings recorded' : feelings,
+                      title.isEmpty ? 'Untitled entry' : title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 14,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -114,7 +115,7 @@ class CheckInDetailPage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Notes section like other modules (white card)
+              // Content card
               Expanded(
                 child: Container(
                   width: double.infinity,
@@ -134,7 +135,7 @@ class CheckInDetailPage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Notes',
+                        'Journal',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
@@ -145,7 +146,9 @@ class CheckInDetailPage extends StatelessWidget {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Text(
-                            notes.isEmpty ? 'No notes for this check-in.' : notes,
+                            content.isEmpty
+                                ? 'No content for this journal.'
+                                : content,
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.black87,
