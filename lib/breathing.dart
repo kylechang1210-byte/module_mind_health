@@ -2,22 +2,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
+import 'database_mindtrack.dart';
 
 class BreathingPage extends StatefulWidget {
   const BreathingPage({super.key});
-
   @override
   State<BreathingPage> createState() => _BreathingPageState();
 }
 
 class _BreathingPageState extends State<BreathingPage> {
-  //Timer
   Timer? _timer;
   int _counter = 4;
   String _phase = "Ready";
   bool _isRunning = false;
   bool _isPaused = false;
-
   final Color _brandColor = const Color(0xFF7555FF);
 
   void _startTimer() {
@@ -29,10 +27,8 @@ class _BreathingPageState extends State<BreathingPage> {
         _counter = 4;
       }
     });
-
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_isPaused) return;
-
       setState(() {
         if (_counter > 1) {
           _counter--;
@@ -52,12 +48,10 @@ class _BreathingPageState extends State<BreathingPage> {
     });
   }
 
-  void _pauseTimer() {
-    setState(() {
-      _isPaused = true;
-      _timer?.cancel();
-    });
-  }
+  void _pauseTimer() => setState(() {
+    _isPaused = true;
+    _timer?.cancel();
+  });
 
   void _resetTimer() {
     _timer?.cancel();
@@ -67,11 +61,11 @@ class _BreathingPageState extends State<BreathingPage> {
       _phase = "Ready";
       _counter = 3;
     });
-    // Log session
     Provider.of<TherapyModel>(
       context,
       listen: false,
     ).recordSession('Breathing Session');
+    DatabaseMindTrack.instance.recordHistory('Breathing', 'Relaxation Session');
   }
 
   @override
@@ -95,8 +89,6 @@ class _BreathingPageState extends State<BreathingPage> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [_brandColor, const Color(0xff5fc3ff)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
             ),
           ),
         ),
@@ -106,10 +98,8 @@ class _BreathingPageState extends State<BreathingPage> {
       body: Center(
         child: SingleChildScrollView(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Vertical Center
-            crossAxisAlignment: CrossAxisAlignment.center, // Horizontal Center
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Breathing Circle
               Container(
                 width: 260,
                 height: 260,
@@ -117,8 +107,6 @@ class _BreathingPageState extends State<BreathingPage> {
                   shape: BoxShape.circle,
                   gradient: LinearGradient(
                     colors: [_brandColor, const Color(0xff5fc3ff)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -151,11 +139,7 @@ class _BreathingPageState extends State<BreathingPage> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 60),
-
-              // Control Buttons
-              // Main Action Button (Start/Pause/Resume)
               SizedBox(
                 width: 200,
                 height: 60,
@@ -164,19 +148,12 @@ class _BreathingPageState extends State<BreathingPage> {
                     backgroundColor: _brandColor,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        22,
-                      ),
+                      borderRadius: BorderRadius.circular(22),
                     ),
-                    elevation: 5,
                   ),
-                  onPressed: () {
-                    if (_isRunning && !_isPaused) {
-                      _pauseTimer();
-                    } else {
-                      _startTimer();
-                    }
-                  },
+                  onPressed: () => (_isRunning && !_isPaused)
+                      ? _pauseTimer()
+                      : _startTimer(),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -200,10 +177,7 @@ class _BreathingPageState extends State<BreathingPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Reset Button (Only visible if running)
               if (_isRunning || _isPaused)
                 SizedBox(
                   width: 200,
