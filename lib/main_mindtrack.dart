@@ -5,30 +5,6 @@ import 'progress_visualization.dart';
 import 'supabase_connection.dart';
 
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await SupabaseConnection.init();
-  runApp(const MyApp());
-}
-
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MindTrack',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MainMindTrackPage(),
-    );
-  }
-}
-
-
 // Combined MainMindTrackPage from main_mindtrack.dart
 class MainMindTrackPage extends StatelessWidget {
   const MainMindTrackPage({super.key});

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:module_mind_health/home_navigator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_config.dart'; // Import config
 import 'resource_hub.dart'; // Import your hub
 import 'forgot_password.dart'; // Keep your existing file
+import 'home_navigator.dart';
 
 // --- 1. AUTH GATE ---
 class AuthGate extends StatefulWidget {
@@ -41,8 +43,7 @@ class _AuthGateState extends State<AuthGate> {
       isAdmin = isHardcodedAdmin || isDbAdmin;
 
       if (mounted) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const ResourceHubScreen()));
-      }
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeNavigator()));      }
     } else {
       if (mounted) {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));
