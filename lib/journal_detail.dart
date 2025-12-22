@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // Helper to format both SQLite dates ("2025-12-21")
-// and Supabase timestamptz ("2025-12-19 14:44:23.72651+00").
+// and supabase timestamptz ("2025-12-19 14:44:23.72651+00").
 String formatJournalDate(String raw) {
   try {
     final dt = DateTime.parse(raw);
