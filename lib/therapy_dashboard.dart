@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'healing_music_page.dart';
-import 'breathing_page.dart';
-import 'movement_page.dart';
+import 'healing_music.dart';
+import 'breathing.dart';
+import 'movement.dart';
 import 'therapy_admin.dart'; // Access to your admin tool
 
 class TherapyDashboard extends StatelessWidget {
