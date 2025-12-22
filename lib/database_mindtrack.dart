@@ -18,12 +18,11 @@ class DatabaseMindTrack {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'mindtrack.db');
 
-    return openDatabase(path, version: 2, onCreate: _onCreate);
+    return openDatabase(path, version: 1, onCreate: _onCreate);
   }
 
   Future<void> _onCreate(Database db, int version) async {
     // Mind Track Module
-    //Check In
     await db.execute('''
       CREATE TABLE checkins(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,40 +34,29 @@ class DatabaseMindTrack {
       )
     ''');
 
-    //Journal
-    await db.execute('''
-    CREATE TABLE journals (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      date TEXT NOT NULL,
-      title TEXT NOT NULL,
-      mood TEXT NOT NULL,
-      content TEXT NOT NULL
-    )
-  ''');
-
     // Therapy Module
     // Music Table
     await db.execute(
       ''
-      'CREATE TABLE music('
-      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-      'title TEXT NOT NULL,'
-      'description TEXT NOT NULL,'
-      'iconCode INTEGER NOT NULL,'
-      'audioPath TEXT NOT NULL'
-      ')',
+          'CREATE TABLE music('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'title TEXT NOT NULL,'
+          'description TEXT NOT NULL,'
+          'iconCode INTEGER NOT NULL,'
+          'audioPath TEXT NOT NULL'
+          ')',
     );
 
     // Mindful Movement Table
     await db.execute(
       ''
-      'CREATE TABLE exercises('
-      'id INTEGER PRIMARY KEY AUTOINCREMENT,'
-      'category TEXT NOT NULL,'
-      'title TEXT NOT NULL,'
-      'description TEXT NOT NULL,'
-      'iconCode INTEGER NOT NULL'
-      ')',
+          'CREATE TABLE exercises('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'category TEXT NOT NULL,'
+          'title TEXT NOT NULL,'
+          'description TEXT NOT NULL,'
+          'iconCode INTEGER NOT NULL'
+          ')',
     );
 
     // Insert default data of Therapy Module
@@ -95,7 +83,7 @@ class DatabaseMindTrack {
         'title': 'Deep Focus',
         'description': 'White noise for study',
         'iconCode': 0xf01e,
-        'audioPath': 'assets/audio/white_noise.mp3',
+        'audioPath': 'assets/audio/focus.mp3',
       },
       {
         'title': 'Ocean Waves',
@@ -197,8 +185,6 @@ class DatabaseMindTrack {
     }
   }
 
-
-  //Insert checkin
   Future<int> insertCheckIn({
     required String date,
     required int mood,
@@ -229,34 +215,6 @@ class DatabaseMindTrack {
   Future<int> deleteAll() async {
     final database = await db;
     return database.delete('checkins');
-  }
-
-  //CRUD Journal
-  Future<int> insertJournal({
-    required String date,
-    required String title,
-    required String mood,
-    required String content,
-  }) async {
-    final database = await db;
-    return database.insert('journals', {
-      'date': date,
-      'title': title,
-      'mood': mood,
-      'content': content,
-    });
-  }
-
-  Future<List<Map<String, dynamic>>> getAllJournals() async {
-    final database = await db;
-    return database.query(
-      'journals', orderBy: 'date DESC',
-    );
-  }
-
-  Future<int> deleteJournal(int id) async {
-    final database = await db;
-    return database.delete('journals', where: 'id = ?', whereArgs: [id]);
   }
 
   // =====================Therapy CRUD Method======================
@@ -312,3 +270,4 @@ class DatabaseMindTrack {
     return database.delete('exercises', where: 'id = ?', whereArgs: [id]);
   }
 }
+
