@@ -21,12 +21,12 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
     super.dispose();
   }
 
-  void _toggleMusic(int musicId, String path, String title) async {
+  void _toggleMusic(int id, String path, String title) async {
     debugPrint("🎵 User clicked: $title");
     debugPrint("📂 Original Path from DB: $path");
 
     try {
-      if (_playingId == musicId) {
+      if (_playingId == id) {
         // STOP Logic
         await _audioPlayer.stop();
         setState(() => _playingId = -1);
@@ -45,7 +45,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
         // Set source and play
         await _audioPlayer.play(AssetSource(cleanPath));
 
-        setState(() => _playingId = musicId);
+        setState(() => _playingId = id);
 
         // Record History
         DatabaseMindTrack.instance.recordHistory('Music', title);
@@ -126,7 +126,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
   }
 
   Widget _buildMusicCard(Map<String, dynamic> song) {
-    int id = song['musicId'];
+    int id = song['id'];
     String title = song['title'];
     String subtitle = song['description'];
     IconData icon = IconData(song['iconCode'], fontFamily: 'MaterialIcons');

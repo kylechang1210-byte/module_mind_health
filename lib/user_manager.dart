@@ -11,9 +11,10 @@ class User {
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'].toString(),
-      name: json['name'] as String? ?? 'No Name',
-      email: json['email'] as String? ?? 'No Email',
+      id: json['id'].toString(), // Safely convert ID to string
+      // Handle NULL values safely so the app doesn't crash
+      name: (json['name'] as String?) ?? 'Unknown User',
+      email: (json['email'] as String?) ?? 'No Email',
     );
   }
 }
@@ -45,7 +46,10 @@ class _UserListTabState extends State<UserListTab> {
   Future<void> _fetchUsers() async {
     setState(() => _isLoading = true);
     try {
+      print("Fetching users...");
       final data = await supabase.from('user').select().order('id');
+      print("Users Data found: $data"); // See if data comes back
+
       final users = (data as List).map((e) => User.fromJson(e)).toList();
 
       setState(() {
@@ -54,7 +58,16 @@ class _UserListTabState extends State<UserListTab> {
         _isLoading = false;
       });
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      print("ERROR FETCHING USERS: $e"); // <--- THIS WILL TELL YOU THE PROBLEM
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error fetching users: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -73,7 +86,7 @@ class _UserListTabState extends State<UserListTab> {
       await supabase.from('user').delete().eq('id', id);
       _fetchUsers();
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Error: $e")));
@@ -147,7 +160,7 @@ class _UserListTabState extends State<UserListTab> {
                       'name': nameCtrl.text.trim(),
                       'email': emailCtrl.text.trim(),
                     };
-                    if (passCtrl.text.isNotEmpty){
+                    if (passCtrl.text.isNotEmpty) {
                       updates['password'] = passCtrl.text.trim();
                     }
                     await supabase
@@ -156,7 +169,7 @@ class _UserListTabState extends State<UserListTab> {
                         .eq('id', user.id);
                     _fetchUsers();
                   } catch (e) {
-                    if (mounted){
+                    if (mounted) {
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text("Error: $e")));
@@ -186,9 +199,8 @@ class _UserListTabState extends State<UserListTab> {
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 0,
-              ), // Fixes internal height gap
+              contentPadding: const EdgeInsets.symmetric(vertical: 0),
+              // Fixes internal height gap
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(30),
                 borderSide: BorderSide.none,
