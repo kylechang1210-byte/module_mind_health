@@ -3,32 +3,52 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 
+
+class _AppColors {
+  // Brand Theme
+  static const Color brandPurple = Color(0xff7b3df0);
+  static const Color brandBlue = Color(0xff5fc3ff);
+  static const Color background = Color(0xFFF3F6FB);
+
+  // Emergency / Hospital Gradients
+  static const Color emergencyRed1 = Color(0xFFEB3349);
+  static const Color emergencyRed2 = Color(0xFFF45C43);
+  static const Color hospitalOrange = Color(0xFFFF512F);
+  static const Color hospitalPink = Color(0xFFDD2476);
+
+  static const LinearGradient brandGradient = LinearGradient(
+    colors: [brandPurple, brandBlue],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient emergencyGradient = LinearGradient(
+    colors: [emergencyRed1, emergencyRed2],
+  );
+
+  static const LinearGradient hospitalGradient = LinearGradient(
+    colors: [hospitalOrange, hospitalPink],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
+
 class CrisisContactsScreen extends StatelessWidget {
   const CrisisContactsScreen({super.key});
-
-  // Brand Colors
-  final Color _brandPurple = const Color(0xff7b3df0);
-  final Color _brandBlue = const Color(0xff5fc3ff);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F6FB), // Matches app theme
+      backgroundColor: _AppColors.background,
       appBar: AppBar(
         title: const Text(
           "Crisis Contacts",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        // Gradient AppBar
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [_brandPurple, _brandBlue],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          decoration: const BoxDecoration(gradient: _AppColors.brandGradient),
         ),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -36,19 +56,22 @@ class CrisisContactsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: const [
+          // 1. Hospital Finder
           _FindHelpCard(),
 
           SizedBox(height: 10),
 
+          // 2. Emergency 999 (Special Red Card)
           _ActionCrisisCard(
             title: "Emergency (999)",
             subtitle: "For life-threatening situations",
             phoneNumber: "999",
             icon: Icons.local_hospital,
             warning: "Only use for immediate danger.",
-            isEmergency: true, // Special Red Card
+            isEmergency: true,
           ),
 
+          // 3. DSA Helpline
           _ActionCrisisCard(
             title: "DSA Helpline",
             subtitle: "TARUMT Student Affairs",
@@ -57,6 +80,7 @@ class CrisisContactsScreen extends StatelessWidget {
             warning: "Available Mon-Fri, 9am - 5pm.",
           ),
 
+          // 4. Befrienders
           _ActionCrisisCard(
             title: "Befrienders KL",
             subtitle: "24/7 Emotional Support",
@@ -70,7 +94,7 @@ class CrisisContactsScreen extends StatelessWidget {
   }
 }
 
-// --- 1. FIND HOSPITAL CARD (Red Gradient for Urgency) ---
+
 class _FindHelpCard extends StatelessWidget {
   const _FindHelpCard();
 
@@ -80,15 +104,10 @@ class _FindHelpCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        // Red Gradient for Hospitals
-        gradient: const LinearGradient(
-          colors: [Color(0xFFFF512F), Color(0xFFDD2476)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: _AppColors.hospitalGradient,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF512F).withValues(alpha: 0.3),
+            color: _AppColors.hospitalOrange.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -99,9 +118,7 @@ class _FindHelpCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () => launchUrl(
-            Uri.parse(
-              "https://www.google.com/maps/search/?api=1&query=hospital+near+me",
-            ),
+            Uri.parse("https://www.google.com/maps/search/?api=1&query=hospital+near+me"),
             mode: LaunchMode.externalApplication,
           ),
           child: Padding(
@@ -120,7 +137,9 @@ class _FindHelpCard extends StatelessWidget {
                     size: 30,
                   ),
                 ),
+
                 const SizedBox(width: 16),
+
                 const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,6 +160,8 @@ class _FindHelpCard extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // Arrow
                 const Icon(Icons.arrow_outward, color: Colors.white70),
               ],
             ),
@@ -151,7 +172,7 @@ class _FindHelpCard extends StatelessWidget {
   }
 }
 
-// --- 2. CONTACT CARDS (Matches MindTrack Style) ---
+
 class _ActionCrisisCard extends StatelessWidget {
   final String title, subtitle, phoneNumber, warning;
   final IconData icon;
@@ -178,6 +199,7 @@ class _ActionCrisisCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Title
               Text(
                 title,
                 style: const TextStyle(
@@ -186,6 +208,8 @@ class _ActionCrisisCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
+
+              // Warning Box
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -212,6 +236,8 @@ class _ActionCrisisCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Actions
               ListTile(
                 leading: const Icon(Icons.call, color: Colors.green),
                 title: const Text("Call Now"),
@@ -248,14 +274,14 @@ class _ActionCrisisCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 999 gets a special gradient, others get the Brand Purple/Blue
+    // Determine gradient based on urgency
     final gradient = isEmergency
-        ? const LinearGradient(
-            colors: [Color(0xFFEB3349), Color(0xFFF45C43)],
-          ) // Emergency Red
-        : const LinearGradient(
-            colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
-          ); // Brand Theme
+        ? _AppColors.emergencyGradient
+        : _AppColors.brandGradient;
+
+    final shadowColor = isEmergency
+        ? Colors.red.withValues(alpha: 0.3)
+        : _AppColors.brandPurple.withValues(alpha: 0.3);
 
     return GestureDetector(
       onTap: () => _showOptions(context),
@@ -266,9 +292,7 @@ class _ActionCrisisCard extends StatelessWidget {
           gradient: gradient,
           boxShadow: [
             BoxShadow(
-              color: isEmergency
-                  ? Colors.red.withValues(alpha: 0.3)
-                  : const Color(0xff7b3df0).withValues(alpha: 0.3),
+              color: shadowColor,
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -278,6 +302,7 @@ class _ActionCrisisCard extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           child: Row(
             children: [
+              // Text Content
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -299,6 +324,7 @@ class _ActionCrisisCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // Tap Indicator Pill
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -320,6 +346,8 @@ class _ActionCrisisCard extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // Icon Circle
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(

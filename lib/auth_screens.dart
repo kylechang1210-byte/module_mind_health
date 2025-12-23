@@ -4,7 +4,37 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_config.dart';
 import 'forgot_password.dart';
 
-// --- 1. AUTH GATE ---
+
+class _AuthStyles {
+  static const Color primaryPurple = Color(0xff7b3df0);
+  static const Color primaryBlue = Color(0xff5fc3ff);
+
+  static const LinearGradient mainGradient = LinearGradient(
+    colors: [primaryPurple, primaryBlue],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static InputDecoration inputDecoration(String label, IconData icon) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: primaryPurple),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: primaryPurple, width: 2),
+      ),
+      filled: true,
+      fillColor: Colors.grey.shade50,
+    );
+  }
+}
+
+//AUTH GATE (Session & Admin Check)
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
@@ -20,22 +50,25 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   Future<void> _checkAuth() async {
+    // Artificial delay for smooth UX
     await Future.delayed(const Duration(milliseconds: 100));
+
     final session = Supabase.instance.client.auth.currentSession;
 
     if (!mounted) return;
 
     if (session != null) {
-      // ADMIN CHECK
+      // ADMIN
       final List<String> adminEmails = [
         "gary@gmail.com",
         "gary.lum12@gmail.com",
       ];
-      bool isHardcodedAdmin =
-          session.user.email != null &&
+
+      //  Hardcoded List
+      bool isHardcodedAdmin = session.user.email != null &&
           adminEmails.contains(session.user.email);
 
-      // Database check (optional)
+      //  Database Role
       bool isDbAdmin = false;
       try {
         final data = await Supabase.instance.client
@@ -44,7 +77,8 @@ class _AuthGateState extends State<AuthGate> {
             .eq('email', session.user.email!)
             .maybeSingle();
         if (data != null && data['role'] == 'admin') isDbAdmin = true;
-      } catch (_) {}
+      } catch (_) {
+      }
 
       isAdmin = isHardcodedAdmin || isDbAdmin;
 
@@ -66,11 +100,15 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(color: _AuthStyles.primaryPurple),
+      ),
+    );
   }
 }
 
-// --- 2. LOGIN SCREEN ---
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
   @override
@@ -89,17 +127,17 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text.trim(),
       );
-      if (mounted){
+      if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const AuthGate()),
         );
       }
     } catch (e) {
-      if (mounted){
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -110,83 +148,86 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Icon(Icons.spa, size: 80, color: kPrimaryBlue),
-            const SizedBox(height: 20),
-            const Text(
-              "Welcome Back",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: kPrimaryBlue,
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // --- Header ---
+              const Icon(Icons.spa, size: 80, color: _AuthStyles.primaryPurple),
+              const SizedBox(height: 20),
+              const Text(
+                "Welcome Back",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: _AuthStyles.primaryPurple,
+                ),
               ),
-            ),
-            const SizedBox(height: 40),
-            TextField(
-              controller: _emailCtrl,
-              decoration: const InputDecoration(
-                labelText: "Email",
-                prefixIcon: Icon(Icons.email),
+              const SizedBox(height: 40),
+
+              // --- Inputs ---
+              TextField(
+                controller: _emailCtrl,
+                decoration: _AuthStyles.inputDecoration("Email", Icons.email),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _passCtrl,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: "Password",
-                prefixIcon: Icon(Icons.lock),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passCtrl,
+                obscureText: true,
+                decoration: _AuthStyles.inputDecoration("Password", Icons.lock),
               ),
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
+
+              // --- Forgot Password ---
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+                  ),
+                  child: const Text(
+                    "Forgot Password?",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _AuthStyles.primaryPurple,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // --- Login Button ---
+              _GradientButton(
+                text: "Login",
+                isLoading: _isLoading,
+                onPressed: _login,
+              ),
+
+              // --- Sign Up Link ---
+              const SizedBox(height: 16),
+              TextButton(
                 onPressed: () => Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const SignUpScreen()),
                 ),
                 child: const Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: kPrimaryBlue,
-                  ),
+                  "Don't have an account? Sign Up",
+                  style: TextStyle(color: _AuthStyles.primaryBlue),
                 ),
               ),
-            ),
-            const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isLoading ? null : _login,
-              child: _isLoading
-                  ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text("Login"),
-            ),
-            TextButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SignUpScreen()),
-              ),
-              child: const Text(
-                "Don't have an account? Sign Up",
-                style: TextStyle(color: kPrimaryBlue),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-// --- 3. SIGN UP SCREEN ---
+
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
   @override
@@ -208,29 +249,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
       return;
     }
+
     setState(() => _isLoading = true);
     try {
+      // Create Auth User
       final response = await Supabase.instance.client.auth.signUp(
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text.trim(),
       );
+
+      // Create Database Entry
       if (response.user != null) {
         await Supabase.instance.client.from('user').insert({
           'name': _nameCtrl.text.trim(),
           'email': _emailCtrl.text.trim(),
         });
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Account created! Please Login.")),
+            const SnackBar(
+              content: Text("Account created! Please Login."),
+              backgroundColor: Colors.green,
+            ),
           );
-          Navigator.pop(context);
+          Navigator.pop(context); // Go back to login
         }
       }
     } catch (e) {
-      if (mounted){
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -241,49 +290,109 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: const Text("Create Account")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      appBar: AppBar(
+        title: const Text("Create Account"),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: Center(
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.person_add, size: 80, color: kPrimaryBlue),
+              // --- Header ---
+              const Icon(
+                Icons.person_add,
+                size: 80,
+                color: _AuthStyles.primaryPurple,
+              ),
               const SizedBox(height: 20),
+
+              // --- Inputs ---
               TextField(
                 controller: _nameCtrl,
-                decoration: const InputDecoration(
-                  labelText: "Username",
-                  prefixIcon: Icon(Icons.badge),
-                ),
+                decoration: _AuthStyles.inputDecoration("Username", Icons.badge),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _emailCtrl,
-                decoration: const InputDecoration(
-                  labelText: "Email",
-                  prefixIcon: Icon(Icons.email),
-                ),
+                decoration: _AuthStyles.inputDecoration("Email", Icons.email),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _passCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: "Password",
-                  prefixIcon: Icon(Icons.lock),
-                ),
+                decoration: _AuthStyles.inputDecoration("Password", Icons.lock),
               ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  onPressed: _isLoading ? null : _signUp,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text("Sign Up"),
-                ),
+              const SizedBox(height: 30),
+
+              // --- Sign Up Button ---
+              _GradientButton(
+                text: "Sign Up",
+                isLoading: _isLoading,
+                onPressed: _signUp,
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// GRADIENT BUTTON
+class _GradientButton extends StatelessWidget {
+  final String text;
+  final bool isLoading;
+  final VoidCallback onPressed;
+
+  const _GradientButton({
+    required this.text,
+    required this.isLoading,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      decoration: BoxDecoration(
+        gradient: _AuthStyles.mainGradient,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: _AuthStyles.primaryPurple.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(25),
+          onTap: isLoading ? null : onPressed,
+          child: Center(
+            child: isLoading
+                ? const SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+                : Text(
+              text,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
           ),
         ),
       ),

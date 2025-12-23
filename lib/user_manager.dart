@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// 1. MODEL CLASS
+// -----------------------------------------------------------------------------
+// 1. DATA MODEL
+// -----------------------------------------------------------------------------
 class User {
   final String id;
   final String name;
@@ -12,14 +14,15 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'].toString(), // Safely convert ID to string
-      // Handle NULL values safely so the app doesn't crash
       name: (json['name'] as String?) ?? 'Unknown User',
       email: (json['email'] as String?) ?? 'No Email',
     );
   }
 }
 
-// 2. THE USER LIST WIDGET
+// -----------------------------------------------------------------------------
+// 2. MAIN WIDGET
+// -----------------------------------------------------------------------------
 class UserListTab extends StatefulWidget {
   const UserListTab({super.key});
 
@@ -28,10 +31,12 @@ class UserListTab extends StatefulWidget {
 }
 
 class _UserListTabState extends State<UserListTab> {
-  final supabase = Supabase.instance.client;
-  final TextEditingController _searchCtrl = TextEditingController();
-  final Color _brandColor = const Color(0xFF7555FF); // Brand Color
+  // --- Constants & Controllers ---
+  final _supabase = Supabase.instance.client;
+  final _searchCtrl = TextEditingController();
+  static const Color _brandColor = Color(0xFF7555FF);
 
+  // --- State Variables ---
   List<User> _allUsers = [];
   List<User> _filteredUsers = [];
   bool _isLoading = true;
@@ -43,20 +48,31 @@ class _UserListTabState extends State<UserListTab> {
     _searchCtrl.addListener(_filterUsers);
   }
 
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
+  // SUPABASE LOGIC
+  // ---------------------------------------------------------------------------
+
   Future<void> _fetchUsers() async {
     setState(() => _isLoading = true);
     try {
       debugPrint("Fetching users...");
-      final data = await supabase.from('user').select().order('id');
-      debugPrint("Users Data found: $data"); // See if data comes back
+      final data = await _supabase.from('user').select().order('id');
 
       final users = (data as List).map((e) => User.fromJson(e)).toList();
 
-      setState(() {
-        _allUsers = users;
-        _filteredUsers = users;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _allUsers = users;
+          _filteredUsers = users;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
       debugPrint("ERROR FETCHING USERS: $e");
       if (mounted) {
@@ -66,6 +82,19 @@ class _UserListTabState extends State<UserListTab> {
             content: Text("Error fetching users: $e"),
             backgroundColor: Colors.red,
           ),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteUser(String id) async {
+    try {
+      await _supabase.from('user').delete().eq('id', id);
+      _fetchUsers(); // Refresh list
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error deleting user: $e")),
         );
       }
     }
@@ -81,24 +110,13 @@ class _UserListTabState extends State<UserListTab> {
     });
   }
 
-  Future<void> _deleteUser(String id) async {
-    try {
-      await supabase.from('user').delete().eq('id', id);
-      _fetchUsers();
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error: $e")));
-      }
-    }
-  }
-
-  // --- UNIFIED BOTTOM SHEET UI FOR EDITING ---
+  // ---------------------------------------------------------------------------
+  // BOTTOM SHEET (EDIT FORM)
+  // ---------------------------------------------------------------------------
   void _showUserForm(User user) {
     final nameCtrl = TextEditingController(text: user.name);
     final emailCtrl = TextEditingController(text: user.email);
-    final passCtrl = TextEditingController(); // Optional new password
+    final passCtrl = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -116,7 +134,8 @@ class _UserListTabState extends State<UserListTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
+            // Header
+            const Text(
               "Edit User",
               style: TextStyle(
                 fontSize: 22,
@@ -126,6 +145,7 @@ class _UserListTabState extends State<UserListTab> {
             ),
             const SizedBox(height: 20),
 
+            // Fields
             TextField(
               controller: nameCtrl,
               decoration: const InputDecoration(labelText: "Full Name"),
@@ -144,6 +164,7 @@ class _UserListTabState extends State<UserListTab> {
               ),
             ),
 
+            // Save Button
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
@@ -154,7 +175,7 @@ class _UserListTabState extends State<UserListTab> {
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () async {
-                  Navigator.pop(ctx);
+                  Navigator.pop(ctx); // Close sheet
                   try {
                     final updates = {
                       'name': nameCtrl.text.trim(),
@@ -163,16 +184,18 @@ class _UserListTabState extends State<UserListTab> {
                     if (passCtrl.text.isNotEmpty) {
                       updates['password'] = passCtrl.text.trim();
                     }
-                    await supabase
+
+                    await _supabase
                         .from('user')
                         .update(updates)
                         .eq('id', user.id);
-                    _fetchUsers();
+
+                    _fetchUsers(); // Refresh data
                   } catch (e) {
                     if (mounted) {
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error updating: $e")),
+                      );
                     }
                   }
                 },
@@ -186,79 +209,120 @@ class _UserListTabState extends State<UserListTab> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // MAIN UI BUILD
+  // ---------------------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: TextField(
-            controller: _searchCtrl,
-            decoration: InputDecoration(
-              hintText: "Search users...",
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              // Fixes internal height gap
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ),
+        // 1. Search Bar
+        _buildSearchBar(),
+
+        // 2. User List
         Expanded(
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _filteredUsers.isEmpty
               ? const Center(child: Text("No users found."))
-              : ListView.builder(
-                  itemCount: _filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final user = _filteredUsers[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
-                      ),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundColor: _brandColor.withValues(alpha: 0.1),
-                          child: Text(
-                            user.name.isNotEmpty
-                                ? user.name[0].toUpperCase()
-                                : '?',
-                            style: TextStyle(
-                              color: _brandColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          user.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(user.email),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _showUserForm(user),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteUser(user.id),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+              : _buildUserList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: TextField(
+        controller: _searchCtrl,
+        decoration: InputDecoration(
+          hintText: "Search users...",
+          prefixIcon: const Icon(Icons.search),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserList() {
+    return ListView.builder(
+      itemCount: _filteredUsers.length,
+      itemBuilder: (context, index) {
+        final user = _filteredUsers[index];
+        return _UserCard(
+          user: user,
+          brandColor: _brandColor,
+          onEdit: () => _showUserForm(user),
+          onDelete: () => _deleteUser(user.id),
+        );
+      },
+    );
+  }
+}
+
+
+class _UserCard extends StatelessWidget {
+  final User user;
+  final Color brandColor;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _UserCard({
+    required this.user,
+    required this.brandColor,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        // Avatar
+        leading: CircleAvatar(
+          backgroundColor: brandColor.withValues(alpha: 0.1),
+          child: Text(
+            user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+            style: TextStyle(
+              color: brandColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        // Info
+        title: Text(
+          user.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(user.email),
+        // Actions
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: onEdit,
+              tooltip: 'Edit User',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: onDelete,
+              tooltip: 'Delete User',
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

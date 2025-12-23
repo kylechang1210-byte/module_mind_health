@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+//  ARTICLE MANAGE
 class ArticleManagerTab extends StatefulWidget {
   const ArticleManagerTab({super.key});
 
@@ -9,8 +10,10 @@ class ArticleManagerTab extends StatefulWidget {
 }
 
 class ArticleManagerTabState extends State<ArticleManagerTab> {
-  final supabase = Supabase.instance.client;
+  // --- State Variables ---
+  final _supabase = Supabase.instance.client;
   final Color _brandColor = const Color(0xFF7555FF);
+
   List<Map<String, dynamic>> _articles = [];
   bool _isLoading = true;
 
@@ -20,27 +23,33 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
     _fetchArticles();
   }
 
+  // SUPABASE
   Future<void> _fetchArticles() async {
     setState(() => _isLoading = true);
     try {
       debugPrint("Fetching articles...");
-      final data = await supabase
-          .from('articles') // Check if table is 'articles' or 'article'
+      final data = await _supabase
+          .from('articles')
           .select()
           .order('id', ascending: false);
 
       debugPrint("Articles Data found: $data");
 
-      setState(() {
-        _articles = List<Map<String, dynamic>>.from(data);
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _articles = List<Map<String, dynamic>>.from(data);
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      debugPrint("ERROR FETCHING ARTICLES: $e"); // <--- ERROR REVEALED HERE
+      debugPrint("ERROR FETCHING ARTICLES: $e");
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching articles: $e"), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text("Error fetching articles: $e"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -48,33 +57,30 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
 
   Future<void> _deleteArticle(int id) async {
     try {
-      await supabase.from('articles').delete().eq('id', id);
-      _fetchArticles();
+      await _supabase.from('articles').delete().eq('id', id);
+      _fetchArticles(); // Refresh list
     } catch (e) {
-      if (mounted){
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),
+        );
       }
     }
   }
 
-  // --- PUBLIC METHOD FOR DASHBOARD FAB ---
+  // METHODS , FORMS
+
+  // Accessed by parent AdminDashboard FAB
   void showAddArticleSheet() => _showArticleForm();
 
-  // --- UNIFIED BOTTOM SHEET UI ---
   void _showArticleForm({Map<String, dynamic>? article}) {
     final isEdit = article != null;
-    final titleCtrl = TextEditingController(
-      text: isEdit ? article['title'] : '',
-    );
-    final subCtrl = TextEditingController(
-      text: isEdit ? article['subtitle'] : '',
-    );
+
+    // Controllers
+    final titleCtrl = TextEditingController(text: isEdit ? article['title'] : '');
+    final subCtrl = TextEditingController(text: isEdit ? article['subtitle'] : '');
     final imgCtrl = TextEditingController(text: isEdit ? article['image'] : '');
-    final contentCtrl = TextEditingController(
-      text: isEdit ? article['full_content'] : '',
-    );
+    final contentCtrl = TextEditingController(text: isEdit ? article['full_content'] : '');
     final urlCtrl = TextEditingController(text: isEdit ? article['url'] : '');
 
     showModalBottomSheet(
@@ -93,6 +99,7 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Header
             Text(
               isEdit ? "Edit Article" : "New Article",
               style: TextStyle(
@@ -103,6 +110,7 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
             ),
             const SizedBox(height: 20),
 
+            // Fields
             TextField(
               controller: titleCtrl,
               decoration: const InputDecoration(labelText: "Title"),
@@ -122,12 +130,12 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
             ),
             TextField(
               controller: urlCtrl,
-              decoration: const InputDecoration(
-                labelText: "External URL (Optional)",
-              ),
+              decoration: const InputDecoration(labelText: "External URL (Optional)"),
             ),
 
             const SizedBox(height: 30),
+
+            // Save Button
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -138,6 +146,7 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
                 ),
                 onPressed: () async {
                   Navigator.pop(ctx);
+
                   final data = {
                     'title': titleCtrl.text.trim(),
                     'subtitle': subCtrl.text.trim(),
@@ -145,21 +154,22 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
                     'full_content': contentCtrl.text.trim(),
                     'url': urlCtrl.text.trim(),
                   };
+
                   try {
                     if (isEdit) {
-                      await supabase
+                      await _supabase
                           .from('articles')
                           .update(data)
                           .eq('id', article['id']);
                     } else {
-                      await supabase.from('articles').insert(data);
+                      await _supabase.from('articles').insert(data);
                     }
-                    _fetchArticles();
+                    _fetchArticles(); // Refresh
                   } catch (e) {
-                    if (mounted){
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: $e")),
+                      );
                     }
                   }
                 },
@@ -173,59 +183,92 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : ListView.builder(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 80),
-            itemCount: _articles.length,
-            itemBuilder: (context, index) {
-              final item = _articles[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                elevation: 2,
-                child: ListTile(
-                  leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      item['image'] ?? '',
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors.grey.shade300,
-                        child: Icon(Icons.article, color: _brandColor),
-                      ),
-                    ),
-                  ),
-                  title: Text(
-                    item['title'] ?? 'No Title',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    item['subtitle'] ?? '',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showArticleForm(article: item),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _deleteArticle(item['id']),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 80),
+      itemCount: _articles.length,
+      itemBuilder: (context, index) {
+        final item = _articles[index];
+        return _ArticleAdminCard(
+          item: item,
+          brandColor: _brandColor,
+          onEdit: () => _showArticleForm(article: item),
+          onDelete: () => _deleteArticle(item['id']),
+        );
+      },
+    );
+  }
+}
+
+// ARTICLE CARD
+class _ArticleAdminCard extends StatelessWidget {
+  final Map<String, dynamic> item;
+  final Color brandColor;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  const _ArticleAdminCard({
+    required this.item,
+    required this.brandColor,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 2,
+      child: ListTile(
+        // Thumbnail
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            item['image'] ?? '',
+            width: 50,
+            height: 50,
+            fit: BoxFit.cover,
+            errorBuilder: (c, e, s) => Container(
+              width: 50,
+              height: 50,
+              color: Colors.grey.shade300,
+              child: Icon(Icons.article, color: brandColor),
+            ),
+          ),
+        ),
+
+        // Text Info
+        title: Text(
+          item['title'] ?? 'No Title',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(
+          item['subtitle'] ?? '',
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        // Actions
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: Colors.blue),
+              onPressed: onEdit,
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: onDelete,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

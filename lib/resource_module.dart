@@ -2,57 +2,76 @@ import 'package:flutter/material.dart';
 import 'package:module_mind_health/therapy_dashboard.dart';
 import 'package:module_mind_health/healing_music.dart';
 import 'package:module_mind_health/breathing.dart';
-
-// Imports for the other pages
 import 'crisis_contacts.dart';
 import 'education_content.dart';
 
-// ===============================================================
-// 1. RESOURCE HUB SCREEN (Main Menu)
-// ===============================================================
+class _AppColors {
+  static const Color brandPurple = Color(0xff7b3df0);
+  static const Color brandBlue = Color(0xff5fc3ff);
+  static const Color background = Color(0xfff3f6fb);
+
+  static const LinearGradient mainGradient = LinearGradient(
+    colors: [brandPurple, brandBlue],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
+
 class ResourceHubScreen extends StatelessWidget {
   const ResourceHubScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfff3f6fb),
+      backgroundColor: _AppColors.background,
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             const SizedBox(height: 20),
+
             const Text(
               'Resource Hub',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xff7b3df0),
+                color: _AppColors.brandPurple,
               ),
             ),
             const SizedBox(height: 24),
 
-            // --- 1. SYMPTOM DECODER (Promoted to Main Feature) ---
+
+            // 1. Symptom Decoder
             _ResourceCard(
               title: 'Symptom\nDecoder',
               icon: Icons.accessibility_new_rounded,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SymptomDecoderScreen())),
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SymptomDecoderScreen())
+              ),
             ),
             const SizedBox(height: 16),
 
-            // --- 2. CRISIS CONTACTS ---
+            // 2. Crisis Contacts
             _ResourceCard(
               title: 'Crisis\nContacts',
               icon: Icons.phone_in_talk,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CrisisContactsScreen())),
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const CrisisContactsScreen())
+              ),
             ),
             const SizedBox(height: 16),
 
-            // --- 3. EDUCATIONAL CONTENT ---
+            // 3. Educational Content
             _ResourceCard(
               title: 'Educational\nContent',
               icon: Icons.menu_book,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EducationContentScreen())),
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const EducationContentScreen())
+              ),
             ),
           ],
         ),
@@ -61,13 +80,16 @@ class ResourceHubScreen extends StatelessWidget {
   }
 }
 
-// --- STANDARD MENU CARD ---
 class _ResourceCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
 
-  const _ResourceCard({required this.title, required this.icon, required this.onTap});
+  const _ResourceCard({
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -75,33 +97,37 @@ class _ResourceCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 110,
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          gradient: const LinearGradient(
-            colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: _AppColors.mainGradient,
           boxShadow: [
             BoxShadow(
-              color: const Color(0xff7b3df0).withValues(alpha: 0.3),
+              color: _AppColors.brandPurple.withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
           ],
         ),
-        padding: const EdgeInsets.all(24),
         child: Row(
           children: [
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.1),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  height: 1.1,
+                ),
               ),
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, size: 32, color: Colors.white),
             ),
           ],
@@ -111,27 +137,22 @@ class _ResourceCard extends StatelessWidget {
   }
 }
 
-// ===============================================================
-// 2. SYMPTOM DECODER SCREEN (Standalone Feature)
-// ===============================================================
 
 class SymptomDecoderScreen extends StatelessWidget {
   const SymptomDecoderScreen({super.key});
 
-  final Color _brandPurple = const Color(0xff7b3df0);
-  final Color _brandBlue = const Color(0xff5fc3ff);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F6FB),
+      backgroundColor: _AppColors.background,
       appBar: AppBar(
-        title: const Text("Symptom Decoder", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Symptom Decoder",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [_brandPurple, _brandBlue]),
-          ),
+          decoration: const BoxDecoration(gradient: _AppColors.mainGradient),
         ),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -141,10 +162,14 @@ class SymptomDecoderScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Text
+            // Instructions
             const Text(
               "What are you feeling?",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -153,7 +178,7 @@ class SymptomDecoderScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
-            // The Grid of Symptoms
+            // Grid
             const _SymptomGrid(),
           ],
         ),
@@ -162,9 +187,11 @@ class SymptomDecoderScreen extends StatelessWidget {
   }
 }
 
+
 class _SymptomGrid extends StatelessWidget {
   const _SymptomGrid();
 
+  // Data Definition
   final List<Map<String, dynamic>> symptoms = const [
     {
       "label": "Racing Heart",
@@ -216,41 +243,71 @@ class _SymptomGrid extends StatelessWidget {
     },
   ];
 
+  // Helper: Show Details Bottom Sheet
   void _showDetail(BuildContext context, Map<String, dynamic> data) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
       builder: (context) => Container(
         padding: const EdgeInsets.all(30),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Icon Bubble
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xff7b3df0).withValues(alpha:0.1), shape: BoxShape.circle),
-              child: Icon(data['icon'], size: 40, color: const Color(0xff7b3df0)),
+              decoration: BoxDecoration(
+                color: _AppColors.brandPurple.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                data['icon'],
+                size: 40,
+                color: _AppColors.brandPurple,
+              ),
             ),
             const SizedBox(height: 20),
-            Text(data['label'], style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+
+            // Text Details
+            Text(
+              data['label'],
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text("Potential Cause: ${data['cause']}", style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            Text(
+              "Potential Cause: ${data['cause']}",
+              style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
-            Text(data['desc'], textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.5)),
+            Text(
+              data['desc'],
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, height: 1.5),
+            ),
             const SizedBox(height: 30),
+
+            // Action Button
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff7b3df0),
+                  backgroundColor: _AppColors.brandPurple,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
                 icon: const Icon(Icons.arrow_forward),
                 label: Text(data['tool']),
                 onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => data['page']));
+                  Navigator.pop(context); // Close sheet
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => data['page']),
+                  );
                 },
               ),
             )
@@ -284,9 +341,19 @@ class _SymptomGrid extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(s['icon'] as IconData, color: const Color(0xff7b3df0), size: 32),
+                Icon(
+                  s['icon'] as IconData,
+                  color: _AppColors.brandPurple,
+                  size: 32,
+                ),
                 const SizedBox(height: 12),
-                Text(s['label'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  s['label'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
           ),
