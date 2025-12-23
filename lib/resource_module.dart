@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:module_mind_health/therapy_dashboard.dart';
 import 'package:module_mind_health/healing_music.dart';
 import 'package:module_mind_health/breathing.dart';
@@ -85,7 +84,7 @@ class _ResourceCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xff7b3df0).withOpacity(0.3),
+              color: const Color(0xff7b3df0).withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -102,7 +101,7 @@ class _ResourceCard extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), shape: BoxShape.circle),
               child: Icon(icon, size: 32, color: Colors.white),
             ),
           ],
@@ -228,7 +227,7 @@ class _SymptomGrid extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xff7b3df0).withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: const Color(0xff7b3df0).withValues(alpha:0.1), shape: BoxShape.circle),
               child: Icon(data['icon'], size: 40, color: const Color(0xff7b3df0)),
             ),
             const SizedBox(height: 20),

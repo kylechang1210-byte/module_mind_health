@@ -46,9 +46,9 @@ class _UserListTabState extends State<UserListTab> {
   Future<void> _fetchUsers() async {
     setState(() => _isLoading = true);
     try {
-      print("Fetching users...");
+      debugPrint("Fetching users...");
       final data = await supabase.from('user').select().order('id');
-      print("Users Data found: $data"); // See if data comes back
+      debugPrint("Users Data found: $data"); // See if data comes back
 
       final users = (data as List).map((e) => User.fromJson(e)).toList();
 
@@ -58,7 +58,7 @@ class _UserListTabState extends State<UserListTab> {
         _isLoading = false;
       });
     } catch (e) {
-      print("ERROR FETCHING USERS: $e"); // <--- THIS WILL TELL YOU THE PROBLEM
+      debugPrint("ERROR FETCHING USERS: $e");
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(

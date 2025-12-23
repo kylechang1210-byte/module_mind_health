@@ -23,20 +23,20 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
   Future<void> _fetchArticles() async {
     setState(() => _isLoading = true);
     try {
-      print("Fetching articles...");
+      debugPrint("Fetching articles...");
       final data = await supabase
           .from('articles') // Check if table is 'articles' or 'article'
           .select()
           .order('id', ascending: false);
 
-      print("Articles Data found: $data");
+      debugPrint("Articles Data found: $data");
 
       setState(() {
         _articles = List<Map<String, dynamic>>.from(data);
         _isLoading = false;
       });
     } catch (e) {
-      print("ERROR FETCHING ARTICLES: $e"); // <--- ERROR REVEALED HERE
+      debugPrint("ERROR FETCHING ARTICLES: $e"); // <--- ERROR REVEALED HERE
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
