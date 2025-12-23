@@ -93,7 +93,7 @@ class _ResourceCard extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xff7b3df0).withOpacity(0.3),
+              color: const Color(0xff7b3df0).withValues(alpha:0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -110,7 +110,7 @@ class _ResourceCard extends StatelessWidget {
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), shape: BoxShape.circle),
               child: Icon(icon, size: 32, color: Colors.white),
             ),
           ],
@@ -287,7 +287,7 @@ class _HealthAwarenessScreenState extends State<HealthAwarenessScreen> {
                     selected: isSelected,
                     onSelected: (bool selected) => _changeCategory(cat),
                     backgroundColor: Colors.white,
-                    selectedColor: _brandPurple.withOpacity(0.15),
+                    selectedColor: _brandPurple.withValues(alpha:0.15),
                     labelStyle: TextStyle(
                       color: isSelected ? _brandPurple : Colors.black87,
                       fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -345,7 +345,7 @@ class _HealthAwarenessScreenState extends State<HealthAwarenessScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _brandPurple.withOpacity(0.1),
+                  color: _brandPurple.withValues(alpha:0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(item.icon, size: 30, color: _brandPurple),
@@ -468,7 +468,7 @@ class _SymptomDecoderWidget extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xff7b3df0).withOpacity(0.1), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: const Color(0xff7b3df0).withValues(alpha:0.1), shape: BoxShape.circle),
               child: Icon(data['icon'], size: 40, color: const Color(0xff7b3df0)),
             ),
             const SizedBox(height: 20),
@@ -569,7 +569,7 @@ class _MentalBatteryWidgetState extends State<_MentalBatteryWidget> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 10, offset: const Offset(0, 4))],
       ),
       child: Column(
         children: [
@@ -586,7 +586,7 @@ class _MentalBatteryWidgetState extends State<_MentalBatteryWidget> {
               activeTrackColor: _getColor(),
               inactiveTrackColor: Colors.grey[200],
               thumbColor: _getColor(),
-              overlayColor: _getColor().withOpacity(0.2),
+              overlayColor: _getColor().withValues(alpha:0.2),
               trackHeight: 12,
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
             ),
@@ -602,7 +602,7 @@ class _MentalBatteryWidgetState extends State<_MentalBatteryWidget> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _getColor().withOpacity(0.1),
+              color: _getColor().withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -693,7 +693,7 @@ class _MythBusterWidgetState extends State<_MythBusterWidget> with SingleTickerP
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: const LinearGradient(colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]), // Dark Purple Gradient
-        boxShadow: [BoxShadow(color: Colors.purple.withOpacity(0.3), blurRadius: 12, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Colors.purple.withValues(alpha:0.3), blurRadius: 12, offset: const Offset(0, 6))],
       ),
       child: Stack(
         children: [
@@ -714,7 +714,7 @@ class _MythBusterWidgetState extends State<_MythBusterWidget> with SingleTickerP
               ),
             ),
           ),
-          Positioned(bottom: 15, right: 15, child: Icon(Icons.touch_app, color: Colors.white.withOpacity(0.5))),
+          Positioned(bottom: 15, right: 15, child: Icon(Icons.touch_app, color: Colors.white.withValues(alpha:0.5))),
         ],
       ),
     );
@@ -729,7 +729,7 @@ class _MythBusterWidgetState extends State<_MythBusterWidget> with SingleTickerP
         borderRadius: BorderRadius.circular(20),
         color: Colors.white,
         border: Border.all(color: const Color(0xff7b3df0), width: 2),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 12, offset: const Offset(0, 6))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.1), blurRadius: 12, offset: const Offset(0, 6))],
       ),
       child: const Center(
         child: Padding(

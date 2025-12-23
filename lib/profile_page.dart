@@ -100,7 +100,7 @@ class ProfilePage extends StatelessWidget {
                 borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
                 boxShadow: [
                   BoxShadow(
-                    color: _brandPurple.withOpacity(0.3),
+                    color: _brandPurple.withValues(alpha: 0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -115,9 +115,9 @@ class ProfilePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withOpacity(0.5), width: 4),
+                      border: Border.all(color: Colors.white.withValues(alpha:0.5), width: 4),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))
+                        BoxShadow(color: Colors.black.withValues(alpha:0.1), blurRadius: 10, offset: const Offset(0, 5))
                       ],
                     ),
                     child: Center(
@@ -136,9 +136,9 @@ class ProfilePage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.4)),
+                      border: Border.all(color: Colors.white.withValues(alpha:0.4)),
                     ),
                     child: Text(
                       isAdmin ? "Administrator" : "Member",
@@ -249,7 +249,7 @@ class _ProfileMenuCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Material(
@@ -263,7 +263,7 @@ class _ProfileMenuCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: iconColor.withOpacity(0.1), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: iconColor.withValues(alpha:0.1), shape: BoxShape.circle),
                   child: Icon(icon, color: iconColor, size: 24),
                 ),
                 const SizedBox(width: 16),

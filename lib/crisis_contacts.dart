@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'app_config.dart';
 
 class CrisisContactsScreen extends StatelessWidget {
   const CrisisContactsScreen({super.key});
@@ -16,7 +15,10 @@ class CrisisContactsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F6FB), // Matches app theme
       appBar: AppBar(
-        title: const Text("Crisis Contacts", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Crisis Contacts",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         // Gradient AppBar
         flexibleSpace: Container(
@@ -86,7 +88,7 @@ class _FindHelpCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFF512F).withOpacity(0.3),
+            color: const Color(0xFFFF512F).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -97,7 +99,9 @@ class _FindHelpCard extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
           onTap: () => launchUrl(
-            Uri.parse("https://www.google.com/maps/search/?api=1&query=hospital+near+me"),
+            Uri.parse(
+              "https://www.google.com/maps/search/?api=1&query=hospital+near+me",
+            ),
             mode: LaunchMode.externalApplication,
           ),
           child: Padding(
@@ -107,10 +111,14 @@ class _FindHelpCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.location_on, color: Colors.white, size: 30),
+                  child: const Icon(
+                    Icons.location_on,
+                    color: Colors.white,
+                    size: 30,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 const Expanded(
@@ -170,7 +178,13 @@ class _ActionCrisisCard extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(12),
@@ -180,12 +194,18 @@ class _ActionCrisisCard extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.orange,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         warning,
-                        style: TextStyle(color: Colors.orange.shade900, fontSize: 13),
+                        style: TextStyle(
+                          color: Colors.orange.shade900,
+                          fontSize: 13,
+                        ),
                       ),
                     ),
                   ],
@@ -230,8 +250,12 @@ class _ActionCrisisCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // 999 gets a special gradient, others get the Brand Purple/Blue
     final gradient = isEmergency
-        ? const LinearGradient(colors: [Color(0xFFEB3349), Color(0xFFF45C43)]) // Emergency Red
-        : const LinearGradient(colors: [Color(0xff7b3df0), Color(0xff5fc3ff)]); // Brand Theme
+        ? const LinearGradient(
+            colors: [Color(0xFFEB3349), Color(0xFFF45C43)],
+          ) // Emergency Red
+        : const LinearGradient(
+            colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
+          ); // Brand Theme
 
     return GestureDetector(
       onTap: () => _showOptions(context),
@@ -242,7 +266,9 @@ class _ActionCrisisCard extends StatelessWidget {
           gradient: gradient,
           boxShadow: [
             BoxShadow(
-              color: isEmergency ? Colors.red.withOpacity(0.3) : const Color(0xff7b3df0).withOpacity(0.3),
+              color: isEmergency
+                  ? Colors.red.withValues(alpha: 0.3)
+                  : const Color(0xff7b3df0).withValues(alpha: 0.3),
               blurRadius: 10,
               offset: const Offset(0, 5),
             ),
@@ -267,18 +293,28 @@ class _ActionCrisisCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: const TextStyle(color: Colors.white70, fontSize: 13),
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
                         "Tap for options",
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -287,7 +323,7 @@ class _ActionCrisisCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, size: 32, color: Colors.white),

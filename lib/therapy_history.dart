@@ -3,7 +3,6 @@ import 'database_mindtrack.dart';
 
 class TherapyHistory extends StatefulWidget {
   const TherapyHistory({super.key});
-
   @override
   State<TherapyHistory> createState() => _TherapyHistoryState();
 }
@@ -47,7 +46,6 @@ class _TherapyHistoryState extends State<TherapyHistory> {
           if (snapshot.connectionState == ConnectionState.waiting){
             return const Center(child: CircularProgressIndicator());
           }
-
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
@@ -107,10 +105,12 @@ class _TherapyHistoryState extends State<TherapyHistory> {
   Icon _getIcon(String type) {
     if (type == 'Music'){
       return const Icon(Icons.music_note, color: Color(0xFF7555FF));
+
     }
     if (type == 'Breathing') return const Icon(Icons.air, color: Colors.blue);
     if (type == 'Movement'){
       return const Icon(Icons.fitness_center, color: Colors.orange);
+
     }
     return const Icon(Icons.check_circle, color: Colors.grey);
   }

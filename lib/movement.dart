@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'therapy_model.dart';
 import 'database_mindtrack.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MovementPage extends StatelessWidget {
   const MovementPage({super.key});
@@ -43,21 +42,7 @@ class MovementPage extends StatelessWidget {
   Widget _buildCategoryCard(BuildContext context, String title, IconData icon) {
     return GestureDetector(
       onTap: () async {
-        final response = await Supabase.instance.client
-            .from('movement')
-            .select()
-            .eq('category', title);
-
-        final steps = List<Map<String, dynamic>>.from(response).map((item) {
-          return {
-            'id': item['id'],
-            'title': item['title'],
-            'description': item['description'],
-            'iconCode': item['icon_code'] ?? 0xe6bd,
-          };
-        }).toList();
-
-        if(!context.mounted) return;
+        final steps = await DatabaseMindTrack.instance.getExercises(title);
         Navigator.push(context, MaterialPageRoute(builder: (context) => ExerciseGuidePage(categoryName: title, steps: steps)));
       },
       child: Container(

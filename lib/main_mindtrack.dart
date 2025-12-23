@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'daily_checkin.dart';  // Keep this for DailyCheckInPage navigation
 import 'journal.dart';
 import 'progress_visualization.dart';
-import 'supabase_connection.dart';
 
 
 // Combined MainMindTrackPage from main_mindtrack.dart

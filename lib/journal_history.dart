@@ -224,7 +224,7 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.25),
+                      color: Colors.white.withValues(alpha:0.25),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -284,7 +284,7 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 6),
-                backgroundColor: Colors.white.withOpacity(0.25),
+                backgroundColor: Colors.white.withValues(alpha:0.25),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),

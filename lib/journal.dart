@@ -228,7 +228,7 @@ class _JournalingPageState extends State<JournalingPage> {
                   boxShadow: [
                     if (selected)
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
+                        color: Colors.black.withValues(alpha:0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),

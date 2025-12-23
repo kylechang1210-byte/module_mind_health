@@ -1,82 +1,143 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'therapy_model.dart';
 import 'healing_music.dart';
 import 'breathing.dart';
 import 'movement.dart';
-// REMOVE import 'therapy_admin.dart'; (Regular users don't need this here anymore)
+import 'therapy_history.dart';
 
 class TherapyDashboard extends StatelessWidget {
   const TherapyDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Wellness Tools"),
-        backgroundColor: const Color(0xFF5C9DFF),
-        foregroundColor: Colors.white,
-        // actions: []  <-- REMOVED THE ACTIONS BLOCK COMPLETELY
+    return ChangeNotifierProvider(
+      create: (context) => TherapyModel(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'MindTrack Therapy',
+        theme: ThemeData(primarySwatch: Colors.deepPurple, useMaterial3: true),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const TherapyPage(),
+          '/healing_music': (context) => const HealingMusicPage(),
+          '/breathing': (context) => const BreathingPage(),
+          '/movement': (context) => const MovementPage(),
+          '/therapy_history': (context) => const TherapyHistory(),
+          //'/admin': (context) => const TherapyAdmin(),
+        },
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          _buildCard(
-            context,
-            "Healing Music",
-            "Relax with calming sounds",
-            Icons.music_note,
-            Colors.purple,
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HealingMusicPage())),
+    );
+  }
+}
+
+class TherapyPage extends StatelessWidget {
+  const TherapyPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xfff3f6fb),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 50),
+              const Text(
+                'Therapy',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff7b3df0),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Tool 1: Music
+              _buildTherapyCard(
+                context: context,
+                title: 'Healing\nMusic',
+                icon: Icons.music_note_rounded,
+                onTap: () => Navigator.pushNamed(context, '/healing_music'),
+              ),
+              const SizedBox(height: 16),
+
+              // Tool 2: Breathing
+              _buildTherapyCard(
+                context: context,
+                title: 'Breathing\nExercise',
+                icon: Icons.air_rounded,
+                onTap: () => Navigator.pushNamed(context, '/breathing'),
+              ),
+              const SizedBox(height: 16),
+
+              // Tool 3: Movement
+              _buildTherapyCard(
+                context: context,
+                title: 'Mindful\nMovement',
+                icon: Icons.accessibility_new_rounded,
+                onTap: () => Navigator.pushNamed(context, '/movement'),
+              ),
+              const SizedBox(height: 16),
+
+              // History
+              _buildTherapyCard(
+                context: context,
+                title: 'Therapy History',
+                icon: Icons.history,
+                onTap: () => Navigator.pushNamed(context, '/therapy_history'),
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
-          _buildCard(
-            context,
-            "Breathing Exercise",
-            "4-7-8 Breathing Technique",
-            Icons.air,
-            Colors.teal,
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const BreathingPage())),
-          ),
-          _buildCard(
-            context,
-            "Mindful Movement",
-            "Yoga, Tai Chi, and more",
-            Icons.directions_walk,
-            Colors.orange,
-                () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MovementPage())),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildCard(BuildContext context, String title, String subtitle, IconData icon, Color color, VoidCallback onTap) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
-                child: Icon(icon, color: color, size: 30),
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                ],
-              ),
-              const Spacer(),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-            ],
+  Widget _buildTherapyCard({
+    required BuildContext context,
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 110,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          // Updated gradient to match MainMindTrackPage colors
+          gradient: const LinearGradient(
+            colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xff7b3df0).withValues(alpha: 0.4),
+              blurRadius: 8,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Icon(icon, size: 48, color: Colors.white),
+          ],
         ),
       ),
     );

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
-
-// Import Tabs
 import 'user_manager.dart'; // Tab 1: Users
 import 'admin_articles.dart'; // Tab 2: Content
 
@@ -62,10 +60,11 @@ class _AdminDashboardState extends State<AdminDashboard>
       await _supabase.from(table).delete().eq('id', id);
       setState(() {});
     } catch (e) {
-      if (mounted)
+      if (mounted){
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 
@@ -170,10 +169,12 @@ class _AdminDashboardState extends State<AdminDashboard>
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _fetchData(table),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData){
           return const Center(child: CircularProgressIndicator());
-        if (snapshot.data!.isEmpty)
+        }
+        if (snapshot.data!.isEmpty){
           return Center(child: Text("No $table items found."));
+        }
 
         return ListView.builder(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 80),
@@ -185,7 +186,7 @@ class _AdminDashboardState extends State<AdminDashboard>
               margin: const EdgeInsets.symmetric(vertical: 8),
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: _brandColor.withOpacity(0.1),
+                  backgroundColor: _brandColor.withValues(alpha: 0.1),
                   child: Icon(
                     IconData(iconCode, fontFamily: 'MaterialIcons'),
                     color: _brandColor,
@@ -226,10 +227,12 @@ class _AdminDashboardState extends State<AdminDashboard>
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _fetchData('history'),
       builder: (context, snapshot) {
-        if (!snapshot.hasData)
+        if (!snapshot.hasData){
           return const Center(child: CircularProgressIndicator());
-        if (snapshot.data!.isEmpty)
+        }
+        if (snapshot.data!.isEmpty){
           return const Center(child: Text("No logs."));
+        }
         return ListView.builder(
           padding: const EdgeInsets.all(10),
           itemCount: snapshot.data!.length,
@@ -422,7 +425,7 @@ class _AdminDashboardState extends State<AdminDashboard>
       },
       content: (s) => [
         DropdownButtonFormField<String>(
-          value: cat,
+          initialValue: cat,
           items: [
             'Yoga',
             'Pilates',

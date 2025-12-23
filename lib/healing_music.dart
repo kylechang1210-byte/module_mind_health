@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'therapy_model.dart';
 import 'database_mindtrack.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HealingMusicPage extends StatefulWidget {
   const HealingMusicPage({super.key});
@@ -22,20 +21,31 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
     super.dispose();
   }
 
-  void _toggleMusic(int id, String path, String title) async {
-    debugPrint("Attempting to play: $path");
+  void _toggleMusic(int musicId, String path, String title) async {
+    debugPrint("🎵 User clicked: $title");
+    debugPrint("📂 Original Path from DB: $path");
+
     try {
-      if (_playingId == id) {
+      if (_playingId == musicId) {
+        // STOP Logic
         await _audioPlayer.stop();
         setState(() => _playingId = -1);
+        debugPrint("⏹️ Music Stopped");
       } else {
-        await _audioPlayer.stop();
-        // Remove 'assets/' if present
-        String cleanPath = path.startsWith('assets/')
-            ? path.replaceFirst('assets/', '')
-            : path;
+        // PLAY Logic
+        await _audioPlayer.stop(); // Stop previous song if any
+
+        String cleanPath = path;
+        if (path.startsWith('assets/')) {
+          cleanPath = path.substring(7);
+        }
+
+        debugPrint("▶️ Playing clean path: $cleanPath");
+
+        // Set source and play
         await _audioPlayer.play(AssetSource(cleanPath));
-        setState(() => _playingId = id);
+
+        setState(() => _playingId = musicId);
 
         // Record History
         DatabaseMindTrack.instance.recordHistory('Music', title);
@@ -45,7 +55,15 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
         ).recordSession('Music: $title');
       }
     } catch (e) {
-      debugPrint("AUDIO ERROR: $e");
+      debugPrint("❌ AUDIO ERROR: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error playing audio: $e"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
@@ -87,32 +105,16 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
             const SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
-                // OLD: future: DatabaseMindTrack.instance.getAllMusic(),
-                // NEW: Fetch from Supabase
-                future: Supabase.instance.client.from('music').select().order('id'),
+                future: DatabaseMindTrack.instance.getAllMusic(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (!snapshot.hasData){
                     return const Center(child: CircularProgressIndicator());
                   }
-                  if (!snapshot.hasData || snapshot.data!.isEmpty){
-                    return const Center(child: Text("No music available yet."));
-                  }
-                  // ... rest of the builder stays the same ...
-                  final songs = List<Map<String, dynamic>>.from(snapshot.data!); // Ensure type
+                  final songs = snapshot.data!;
                   return ListView.builder(
-                      itemCount: songs.length,
-                      itemBuilder: (context, index) {
-                        // Map snake_case (Supabase) to the keys your widget expects
-                        final song = songs[index];
-                        final mappedSong = {
-                          'id': song['id'],
-                          'title': song['title'],
-                          'description': song['description'],
-                          'iconCode': song['icon_code'] ?? 0xe6bd,
-                          'audioPath': song['audio_path']
-                        };
-                        return _buildMusicCard(mappedSong);
-                      }
+                    itemCount: songs.length,
+                    itemBuilder: (context, index) =>
+                        _buildMusicCard(songs[index]),
                   );
                 },
               ),
@@ -124,7 +126,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
   }
 
   Widget _buildMusicCard(Map<String, dynamic> song) {
-    int id = song['id'];
+    int id = song['musicId'];
     String title = song['title'];
     String subtitle = song['description'];
     IconData icon = IconData(song['iconCode'], fontFamily: 'MaterialIcons');
@@ -136,10 +138,11 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
+        // Selection Effect: Purple border when playing
         border: isPlaying ? Border.all(color: _mainColor, width: 3) : null,
         boxShadow: [
           BoxShadow(
-            color: _mainColor.withValues(alpha: 0.5),
+            color: _mainColor.withValues(alpha: .5),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -179,11 +182,29 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
               ],
             ),
           ),
-          IconButton(
-            icon: Icon(isPlaying ? Icons.stop_circle : Icons.play_circle_fill),
-            color: isPlaying ? Colors.grey : _mainColor,
-            iconSize: 32,
-            onPressed: () => _toggleMusic(id, song['audioPath'], title),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Play/Stop Button
+              IconButton(
+                icon: Icon(
+                  isPlaying ? Icons.stop_circle : Icons.play_circle_fill,
+                ),
+                color: isPlaying ? Colors.grey : _mainColor,
+                iconSize: 32,
+                onPressed: () => _toggleMusic(id, song['audioPath'], title),
+              ),
+              // Pause Button
+              IconButton(
+                icon: const Icon(Icons.pause_circle_filled),
+                color: isPlaying ? _mainColor : Colors.grey[300],
+                iconSize: 32,
+                onPressed: () {
+                  _audioPlayer.pause();
+                  // Note: Pausing keeps the playing ID so the border stays purple
+                },
+              ),
+            ],
           ),
         ],
       ),

@@ -22,6 +22,7 @@ class DatabaseMindTrack {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    // Check-ins
     await db.execute('''
       CREATE TABLE checkins(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,16 +34,16 @@ class DatabaseMindTrack {
       )
     ''');
 
-//Journal
+    // Journals
     await db.execute('''
-   CREATE TABLE journals (
-     id INTEGER PRIMARY KEY AUTOINCREMENT,
-     date TEXT NOT NULL,
-     title TEXT NOT NULL,
-     mood TEXT NOT NULL,
-     content TEXT NOT NULL
-   )
- ''');
+      CREATE TABLE journals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT NOT NULL,
+        title TEXT NOT NULL,
+        mood TEXT NOT NULL,
+        content TEXT NOT NULL
+      )
+    ''');
 
     // Music
     await db.execute('''
@@ -54,6 +55,7 @@ class DatabaseMindTrack {
         audioPath TEXT NOT NULL
       )
     ''');
+
     // Exercises
     await db.execute('''
       CREATE TABLE exercises(
@@ -64,7 +66,8 @@ class DatabaseMindTrack {
         iconCode INTEGER NOT NULL
       )
     ''');
-    // Therapy History
+
+    // History
     await db.execute('''
       CREATE TABLE history(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,6 +76,7 @@ class DatabaseMindTrack {
         timestamp TEXT NOT NULL
       )
     ''');
+
     await _defaultData(db);
   }
 
@@ -149,27 +153,37 @@ class DatabaseMindTrack {
   // History
   Future<int> recordHistory(String type, String detail) async {
     final database = await db;
-    final String timeString = DateTime.now().toIso8601String();
 
-    // 1. Local SQLite
+    // 1. Get current UTC time
+    DateTime nowUtc = DateTime.now().toUtc();
+
+    // 2. Add 8 hours to convert to Malaysia Time
+    DateTime malaysiaTime = nowUtc.add(const Duration(hours: 8));
+
+    // 3. Convert to ISO String for storage
+    final String timeString = malaysiaTime.toIso8601String();
+
+    // Local SQLite
     int id = await database.insert('history', {
       'type': type,
       'detail': detail,
       'timestamp': timeString,
     });
-    debugPrint("✅ Saved to Local SQLite (ID: $id)");
+    debugPrint("✅ Saved to Local SQLite (ID: $id) at $timeString");
 
-    // 2. Supabase Cloud
+    // Supabase
     try {
+      debugPrint("☁️ Attempting upload to Supabase...");
       await Supabase.instance.client.from('history').insert({
         'type': type,
         'detail': detail,
         'timestamp': timeString,
       });
-      debugPrint("✅ Synced to Supabase!");
+      debugPrint("✅ Successfully uploaded to Supabase!");
     } catch (e) {
-      debugPrint("❌ Supabase Sync Failed: $e");
+      debugPrint("❌ SUPABASE UPLOAD FAILED: $e");
     }
+
     return id;
   }
 
@@ -227,6 +241,7 @@ class DatabaseMindTrack {
     return db.delete('exercises', where: 'id = ?', whereArgs: [id]);
   }
 
+  // CheckIn
   Future<int> insertCheckIn({
     required String date,
     required int mood,
@@ -259,7 +274,7 @@ class DatabaseMindTrack {
     return database.delete('checkins');
   }
 
-  //CRUD Journal
+  // Journal
   Future<int> insertJournal({
     required String date,
     required String title,
@@ -275,20 +290,13 @@ class DatabaseMindTrack {
     });
   }
 
-
   Future<List<Map<String, dynamic>>> getAllJournals() async {
     final database = await db;
-    return database.query(
-      'journals', orderBy: 'date DESC',
-    );
+    return database.query('journals', orderBy: 'date DESC');
   }
-
 
   Future<int> deleteJournal(int id) async {
     final database = await db;
     return database.delete('journals', where: 'id = ?', whereArgs: [id]);
   }
 }
-
-
-

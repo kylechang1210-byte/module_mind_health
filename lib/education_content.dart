@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import 'app_config.dart';
 import 'database_helper.dart'; // SQLite
 
 class EducationContentScreen extends StatefulWidget {
@@ -105,7 +104,7 @@ class _ArticleCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xff7b3df0).withOpacity(0.3),
+            color: const Color(0xff7b3df0).withValues(alpha:0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -128,9 +127,9 @@ class _ArticleCard extends StatelessWidget {
                   width: 76,
                   height: 76,
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha:0.2),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                    border: Border.all(color: Colors.white.withValues(alpha:0.3), width: 1),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
@@ -268,7 +267,7 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
               child: Image.network(
                 image,
                 fit: BoxFit.cover,
-                errorBuilder: (c, e, s) => Container(color: _brandPurple.withOpacity(0.5), child: const Icon(Icons.article, size: 50, color: Colors.white)),
+                errorBuilder: (c, e, s) => Container(color: _brandPurple.withValues(alpha:0.5), child: const Icon(Icons.article, size: 50, color: Colors.white)),
               ),
             )
                 : Container(color: _brandPurple),
