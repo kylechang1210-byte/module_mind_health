@@ -1,16 +1,21 @@
-import 'package:flutter/material.dart';
 import 'database_mindtrack.dart';
 import 'checkin_history.dart';
 import 'supabase_connection.dart';
+import 'package:flutter/material.dart';
+
 
 
 class DailyCheckInPage extends StatefulWidget {
   const DailyCheckInPage({super.key});
 
 
+
+
   @override
   State<DailyCheckInPage> createState() => _DailyCheckInPageState();
 }
+
+
 
 
 class _DailyCheckInPageState extends State<DailyCheckInPage> {
@@ -19,6 +24,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   final _notesCtrl = TextEditingController();
   int selectedMood = 4;
   double _selectedRange = 0.75; // 0.0 – 1.0
+
+
 
 
   final List<String> feelings = [
@@ -30,6 +37,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   final Set<String> selectedFeelings = {};
 
 
+
+
   //Supabase
   Future<void> _saveToSupabase({
     required int mood,
@@ -38,6 +47,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
     required String notes,
   }) async {
     final supabase = SupabaseConnection.client;
+
+
 
 
     await supabase.from('checkins').insert({
@@ -51,6 +62,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   @override
   void dispose() {
     _customFeelingCtrl.dispose();
@@ -61,9 +74,15 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
 
 
 
+
+
+
+
   void _onEmojiTap(int moodIndex) {
     setState(() {
       selectedMood = moodIndex;
+
+
 
 
       switch (moodIndex) {
@@ -77,8 +96,12 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   String getRangeLabel() {
     final percent = (_selectedRange * 100).round();
+
+
 
 
     if (percent <= 20) {
@@ -97,12 +120,20 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
 
 
 
+
+
+
+
   void _onSliderChanged(double value) {
     setState(() {
       _selectedRange = value;
 
 
+
+
       final percent = (_selectedRange * 100).round();
+
+
 
 
       if (percent <= 20) {
@@ -118,6 +149,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       }
     });
   }
+
+
 
 
   void myAlertDialogSuccessCheckIn(){
@@ -141,6 +174,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   void myAlertDialogErrorCheckIn(String message){
     AlertDialog errorAlertDialog = AlertDialog(
       title: const Text('Error'),
@@ -161,9 +196,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   void _onCheckIn() async {
     if (_formKey.currentState!.validate()) {
       final score = (_selectedRange * 100).round();
+
+
 
 
       final List<String> all = selectedFeelings.toList();
@@ -174,6 +213,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       final feelingsText = all.join(', ');
 
 
+
+
       try {
         await DatabaseMindTrack.instance.insertCheckIn(
           date: DateTime.now().toIso8601String().substring(0, 10),
@@ -181,6 +222,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
           score: score,
           feelings: feelingsText,
           notes: _notesCtrl.text.trim(),
+
+
 
 
         );
@@ -194,8 +237,16 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
 
 
 
+
+
+
+
         if (!mounted) return;
         myAlertDialogSuccessCheckIn();
+
+
+
+
 
 
 
@@ -209,9 +260,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
         myAlertDialogErrorCheckIn('Failed to save: $e');
 
 
+
+
       }
     }
   }
+
+
 
 
   @override
@@ -263,6 +318,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   Widget _buildTitle() {
     return Text.rich(
       TextSpan(
@@ -289,9 +346,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   Widget _buildMoodRow() {
     final moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
     final faces = ['😫', '😕', '😐', '🙂', '😄'];
+
+
 
 
     return Row(
@@ -338,9 +399,13 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   Widget _buildRangePill() {
     final min = (_selectedRange * 100).round();
     const max = 100;
+
+
 
 
     return Column(
@@ -378,6 +443,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       ],
     );
   }
+
+
 
 
   Widget _buildFeelingCard() {
@@ -448,6 +515,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   Widget _buildCustomFeelingField() {
     return TextFormField(
       controller: _customFeelingCtrl,
@@ -474,6 +543,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
   }
 
 
+
+
   Widget _buildNotesField() {
     return TextFormField(
       controller: _notesCtrl,
@@ -493,6 +564,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
       ),
     );
   }
+
+
 
 
   Widget _buildCheckInButton() {
@@ -515,6 +588,8 @@ class _DailyCheckInPageState extends State<DailyCheckInPage> {
             color: Colors.white,
           ),
         ),
+
+
 
 
       ),

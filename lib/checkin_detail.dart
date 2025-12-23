@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+
 String formatCheckInDate(String raw) {
   try {
     final dt = DateTime.parse(raw);
@@ -11,24 +12,30 @@ String formatCheckInDate(String raw) {
   }
 }
 
+
 class CheckInDetailPage extends StatelessWidget {
   final Map<String, dynamic> data;
 
+
   const CheckInDetailPage({super.key, required this.data});
+
 
   @override
   Widget build(BuildContext context) {
     final String rawDate = data['date'] ?? '';
     final String date = formatCheckInDate(rawDate);
 
+
     final int mood = data['mood'] ?? 0;
     final int score = data['score'] ?? 0;
     final String feelings = data['feelings'] ?? '';
     final String notes = data['notes'] ?? '';
 
+
     const moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
     final String moodText =
     (mood >= 0 && mood < moods.length) ? moods[mood] : mood.toString();
+
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
@@ -112,7 +119,9 @@ class CheckInDetailPage extends StatelessWidget {
                 ),
               ),
 
+
               const SizedBox(height: 20),
+
 
               // Notes section like other modules (white card)
               Expanded(

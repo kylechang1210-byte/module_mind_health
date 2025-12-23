@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'therapy_model.dart';
 import 'database_mindtrack.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HealingMusicPage extends StatefulWidget {
   const HealingMusicPage({super.key});
@@ -86,16 +87,32 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
             const SizedBox(height: 20),
             Expanded(
               child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: DatabaseMindTrack.instance.getAllMusic(),
+                // OLD: future: DatabaseMindTrack.instance.getAllMusic(),
+                // NEW: Fetch from Supabase
+                future: Supabase.instance.client.from('music').select().order('id'),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData){
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  final songs = snapshot.data!;
+                  if (!snapshot.hasData || snapshot.data!.isEmpty){
+                    return const Center(child: Text("No music available yet."));
+                  }
+                  // ... rest of the builder stays the same ...
+                  final songs = List<Map<String, dynamic>>.from(snapshot.data!); // Ensure type
                   return ListView.builder(
-                    itemCount: songs.length,
-                    itemBuilder: (context, index) =>
-                        _buildMusicCard(songs[index]),
+                      itemCount: songs.length,
+                      itemBuilder: (context, index) {
+                        // Map snake_case (Supabase) to the keys your widget expects
+                        final song = songs[index];
+                        final mappedSong = {
+                          'id': song['id'],
+                          'title': song['title'],
+                          'description': song['description'],
+                          'iconCode': song['icon_code'] ?? 0xe6bd,
+                          'audioPath': song['audio_path']
+                        };
+                        return _buildMusicCard(mappedSong);
+                      }
                   );
                 },
               ),

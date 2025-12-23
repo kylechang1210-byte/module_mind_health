@@ -1,39 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AdminArticleManager extends StatefulWidget {
-  const AdminArticleManager({super.key});
+class ArticleManagerTab extends StatefulWidget {
+  const ArticleManagerTab({super.key});
 
   @override
-  State<AdminArticleManager> createState() => _AdminArticleManagerState();
+  State<ArticleManagerTab> createState() => ArticleManagerTabState();
 }
 
-class _AdminArticleManagerState extends State<AdminArticleManager> {
+class ArticleManagerTabState extends State<ArticleManagerTab> {
   final supabase = Supabase.instance.client;
+  final Color _brandColor = const Color(0xFF7555FF);
   List<Map<String, dynamic>> _articles = [];
   bool _isLoading = true;
-
-  // Controllers
-  final _titleCtrl = TextEditingController();
-  final _subCtrl = TextEditingController();
-  final _imgCtrl = TextEditingController();
-  final _contentCtrl = TextEditingController();
-  final _urlCtrl = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchArticles();
-  }
-
-  @override
-  void dispose() {
-    _titleCtrl.dispose();
-    _subCtrl.dispose();
-    _imgCtrl.dispose();
-    _contentCtrl.dispose();
-    _urlCtrl.dispose();
-    super.dispose();
   }
 
   Future<void> _fetchArticles() async {
@@ -42,168 +26,120 @@ class _AdminArticleManagerState extends State<AdminArticleManager> {
       final data = await supabase.from('articles').select().order('id', ascending: false);
       setState(() {
         _articles = List<Map<String, dynamic>>.from(data);
+        _isLoading = false;
       });
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  Future<void> _saveArticle({int? id}) async {
-    if (_titleCtrl.text.isEmpty || _contentCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Title and Content are required')));
-      return;
-    }
-
-    final data = {
-      'title': _titleCtrl.text.trim(),
-      'subtitle': _subCtrl.text.trim(),
-      'image': _imgCtrl.text.isNotEmpty ? _imgCtrl.text.trim() : 'https://placehold.co/600x400',
-      'full_content': _contentCtrl.text.trim(),
-      'url': _urlCtrl.text.isNotEmpty ? _urlCtrl.text.trim() : 'https://google.com',
-    };
-
-    try {
-      if (id == null) {
-        // CREATE (New)
-        await supabase.from('articles').insert(data);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Article Posted!')));
-      } else {
-        // UPDATE (Edit)
-        await supabase.from('articles').update(data).eq('id', id);
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Article Updated!')));
-      }
-
-      if (mounted) Navigator.pop(context); // Close dialog
-      _fetchArticles(); // Refresh list
-    } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if(mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _deleteArticle(int id) async {
-    // Confirm delete dialog
-    final bool? confirm = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Article?"),
-        content: const Text("This action cannot be undone."),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          TextButton(onPressed: () => Navigator.pop(context, true), style: TextButton.styleFrom(foregroundColor: Colors.red), child: const Text("Delete")),
-        ],
-      ),
-    );
-
-    if (confirm != true) return;
-
     try {
       await supabase.from('articles').delete().eq('id', id);
       _fetchArticles();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
-  // Unified Dialog for Add AND Edit
-  void _showArticleDialog({Map<String, dynamic>? article}) {
-    // If article is null, we are ADDING. If not null, we are EDITING.
-    if (article != null) {
-      _titleCtrl.text = article['title'] ?? '';
-      _subCtrl.text = article['subtitle'] ?? '';
-      _imgCtrl.text = article['image'] ?? '';
-      _contentCtrl.text = article['full_content'] ?? '';
-      _urlCtrl.text = article['url'] ?? '';
-    } else {
-      _titleCtrl.clear();
-      _subCtrl.clear();
-      _imgCtrl.clear();
-      _contentCtrl.clear();
-      _urlCtrl.clear();
-    }
+  // --- PUBLIC METHOD FOR DASHBOARD FAB ---
+  void showAddArticleSheet() => _showArticleForm();
 
-    showDialog(
+  // --- UNIFIED BOTTOM SHEET UI ---
+  void _showArticleForm({Map<String, dynamic>? article}) {
+    final isEdit = article != null;
+    final titleCtrl = TextEditingController(text: isEdit ? article['title'] : '');
+    final subCtrl = TextEditingController(text: isEdit ? article['subtitle'] : '');
+    final imgCtrl = TextEditingController(text: isEdit ? article['image'] : '');
+    final contentCtrl = TextEditingController(text: isEdit ? article['full_content'] : '');
+    final urlCtrl = TextEditingController(text: isEdit ? article['url'] : '');
+
+    showModalBottomSheet(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(article == null ? "Add New Article" : "Edit Article"),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: _titleCtrl, decoration: const InputDecoration(labelText: "Title*")),
-              TextField(controller: _subCtrl, decoration: const InputDecoration(labelText: "Subtitle")),
-              TextField(controller: _imgCtrl, decoration: const InputDecoration(labelText: "Image URL")),
-              TextField(controller: _urlCtrl, decoration: const InputDecoration(labelText: "External Link")),
-              const SizedBox(height: 10),
-              TextField(
-                  controller: _contentCtrl,
-                  maxLines: 5,
-                  decoration: const InputDecoration(labelText: "Full Content*", border: OutlineInputBorder())
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 25, right: 25, top: 25),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(isEdit ? "Edit Article" : "New Article", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _brandColor)),
+            const SizedBox(height: 20),
+
+            TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: "Title")),
+            TextField(controller: subCtrl, decoration: const InputDecoration(labelText: "Subtitle")),
+            TextField(controller: imgCtrl, decoration: const InputDecoration(labelText: "Image URL")),
+            TextField(controller: contentCtrl, maxLines: 3, decoration: const InputDecoration(labelText: "Full Content")),
+            TextField(controller: urlCtrl, decoration: const InputDecoration(labelText: "External URL (Optional)")),
+
+            const SizedBox(height: 30),
+            SizedBox(
+              width: double.infinity, height: 50,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: _brandColor, foregroundColor: Colors.white),
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  final data = {
+                    'title': titleCtrl.text.trim(),
+                    'subtitle': subCtrl.text.trim(),
+                    'image': imgCtrl.text.trim(),
+                    'full_content': contentCtrl.text.trim(),
+                    'url': urlCtrl.text.trim(),
+                  };
+                  try {
+                    if (isEdit) {
+                      await supabase.from('articles').update(data).eq('id', article['id']);
+                    } else {
+                      await supabase.from('articles').insert(data);
+                    }
+                    _fetchArticles();
+                  } catch (e) {
+                    if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+                  }
+                },
+                child: const Text("SAVE DATA"),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 25),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          ElevatedButton(
-            // Pass the ID if we are editing
-            onPressed: () => _saveArticle(id: article?['id']),
-            child: Text(article == null ? "Post" : "Save Changes"),
-          ),
-        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Manage Articles")),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showArticleDialog(), // No argument = Add Mode
-        child: const Icon(Icons.add),
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-        itemCount: _articles.length,
-        itemBuilder: (context, index) {
-          final item = _articles[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: ListTile(
-              leading: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: Image.network(
-                  item['image'] ?? '',
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (c,e,s) => Container(width: 50, height: 50, color: Colors.grey.shade300, child: const Icon(Icons.article)),
-                ),
-              ),
-              title: Text(item['title'] ?? 'No Title'),
-              subtitle: Text(item['subtitle'] ?? ''),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // EDIT BUTTON
-                  IconButton(
-                    icon: const Icon(Icons.edit, color: Colors.blue),
-                    onPressed: () => _showArticleDialog(article: item), // Pass item = Edit Mode
-                  ),
-                  // DELETE BUTTON
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deleteArticle(item['id']),
-                  ),
-                ],
+    return _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : ListView.builder(
+      padding: const EdgeInsets.fromLTRB(10, 0, 10, 80),
+      itemCount: _articles.length,
+      itemBuilder: (context, index) {
+        final item = _articles[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          elevation: 2,
+          child: ListTile(
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                item['image'] ?? '',
+                width: 50, height: 50, fit: BoxFit.cover,
+                errorBuilder: (c,e,s) => Container(width: 50, height: 50, color: Colors.grey.shade300, child: Icon(Icons.article, color: _brandColor)),
               ),
             ),
-          );
-        },
-      ),
+            title: Text(item['title'] ?? 'No Title', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(item['subtitle'] ?? '', maxLines: 1, overflow: TextOverflow.ellipsis),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(icon: const Icon(Icons.edit, color: Colors.blue), onPressed: () => _showArticleForm(article: item)),
+                IconButton(icon: const Icon(Icons.delete, color: Colors.red), onPressed: () => _deleteArticle(item['id'])),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

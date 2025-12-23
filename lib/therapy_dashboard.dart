@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'healing_music.dart';
 import 'breathing.dart';
 import 'movement.dart';
-import 'therapy_admin.dart'; // Access to your admin tool
+// REMOVE import 'therapy_admin.dart'; (Regular users don't need this here anymore)
 
 class TherapyDashboard extends StatelessWidget {
   const TherapyDashboard({super.key});
@@ -14,13 +14,7 @@ class TherapyDashboard extends StatelessWidget {
         title: const Text("Wellness Tools"),
         backgroundColor: const Color(0xFF5C9DFF),
         foregroundColor: Colors.white,
-        actions: [
-          // Optional: Button to reach therapy admin
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TherapyAdmin())),
-          )
-        ],
+        // actions: []  <-- REMOVED THE ACTIONS BLOCK COMPLETELY
       ),
       body: ListView(
         padding: const EdgeInsets.all(20),

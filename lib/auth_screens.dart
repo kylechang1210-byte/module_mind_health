@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:module_mind_health/home_navigator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_config.dart'; // Import config
-import 'resource_hub.dart'; // Import your hub
+import 'resource_module.dart';
 import 'forgot_password.dart'; // Keep your existing file
 import 'home_navigator.dart';
 
