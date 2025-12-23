@@ -15,8 +15,6 @@ String formatJournalDate(String raw) {
   }
 }
 
-
-
 class JournalHistoryPage extends StatefulWidget {
   const JournalHistoryPage({super.key});
 
@@ -41,10 +39,7 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
       // 1) Local SQLite
       final localRows = await DatabaseMindTrack.instance.getAllJournals();
       final local = localRows
-          .map((row) => {
-        ...row,
-        'source': 'local',
-      })
+          .map((row) => {...row, 'source': 'local'})
           .toList();
 
       // 2) Remote Supabase
@@ -57,14 +52,16 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
             .order('date', ascending: false);
 
         remote = (data as List)
-            .map<Map<String, dynamic>>((row) => {
-          'id': row['id'],
-          'date': row['date'],
-          'title': row['title'] ?? '',
-          'mood': row['mood'] ?? '',
-          'content': row['content'] ?? '',
-          'source': 'supabase',
-        })
+            .map<Map<String, dynamic>>(
+              (row) => {
+                'id': row['id'],
+                'date': row['date'],
+                'title': row['title'] ?? '',
+                'mood': row['mood'] ?? '',
+                'content': row['content'] ?? '',
+                'source': 'supabase',
+              },
+            )
             .toList();
       } catch (_) {
         // if remote fails (offline), just keep local
@@ -96,14 +93,13 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
       setState(() => _journals = merged);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load journals: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to load journals: $e')));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-
 
   Future<void> _deleteJournal(Map<String, dynamic> row) async {
     final int id = row['id'] as int;
@@ -123,7 +119,9 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
   }
 
   void myAlertDialogDeleteJournal(
-      BuildContext context, Map<String, dynamic> row) {
+    BuildContext context,
+    Map<String, dynamic> row,
+  ) {
     AlertDialog deleteDialog = AlertDialog(
       title: const Text('Delete Journal'),
       content: const Text('Are you sure you want to delete this entry?'),
@@ -170,22 +168,23 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
           : _journals.isEmpty
           ? const Center(child: Text('No journal entries yet.'))
           : RefreshIndicator(
-        onRefresh: _loadJournals,
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16, vertical: 12),
-          itemCount: _journals.length,
-          itemBuilder: (context, index) {
-            final data = _journals[index];
-            return _buildJournalCard(context, data);
-          },
-        ),
-      ),
+              onRefresh: _loadJournals,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                itemCount: _journals.length,
+                itemBuilder: (context, index) {
+                  final data = _journals[index];
+                  return _buildJournalCard(context, data);
+                },
+              ),
+            ),
     );
   }
 
-  Widget _buildJournalCard(
-      BuildContext context, Map<String, dynamic> data) {
+  Widget _buildJournalCard(BuildContext context, Map<String, dynamic> data) {
     final String rawDate = data['date'] ?? '';
     final String date = formatJournalDate(rawDate);
 
@@ -222,9 +221,11 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.25),
+                      color: Colors.white.withValues(alpha: 0.25),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -237,8 +238,7 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.white),
-                    onPressed: () =>
-                        myAlertDialogDeleteJournal(context, data),
+                    onPressed: () => myAlertDialogDeleteJournal(context, data),
                   ),
                 ],
               ),
@@ -262,10 +262,7 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
           // source label (optional)
           Text(
             'Source: ${source == 'local' ? 'SQLite' : 'Supabase'}',
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 11,
-            ),
+            style: const TextStyle(color: Colors.white70, fontSize: 11),
           ),
 
           const SizedBox(height: 8),
@@ -283,8 +280,10 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
               },
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 6),
-                backgroundColor: Colors.white.withValues(alpha:0.25),
+                  horizontal: 14,
+                  vertical: 6,
+                ),
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),

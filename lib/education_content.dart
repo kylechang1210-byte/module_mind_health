@@ -28,7 +28,10 @@ class _EducationContentScreenState extends State<EducationContentScreen> {
 
   Future<void> _fetchContent() async {
     try {
-      final data = await supabase.from('articles').select().order('id', ascending: false);
+      final data = await supabase
+          .from('articles')
+          .select()
+          .order('id', ascending: false);
       setState(() {
         _articles = List<Map<String, dynamic>>.from(data);
         _isLoading = false;
@@ -43,7 +46,10 @@ class _EducationContentScreenState extends State<EducationContentScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F6FB), // Matches App Theme
       appBar: AppBar(
-        title: const Text("Educational Content", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Educational Content",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         // Gradient AppBar
         flexibleSpace: Container(
@@ -64,7 +70,7 @@ class _EducationContentScreenState extends State<EducationContentScreen> {
               context,
               MaterialPageRoute(builder: (_) => const FavoritesScreen()),
             ),
-          )
+          ),
         ],
       ),
       body: _isLoading
@@ -72,13 +78,13 @@ class _EducationContentScreenState extends State<EducationContentScreen> {
           : _articles.isEmpty
           ? const Center(child: Text("No articles yet."))
           : ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: _articles.length,
-        itemBuilder: (context, index) {
-          final item = _articles[index];
-          return _ArticleCard(item: item);
-        },
-      ),
+              padding: const EdgeInsets.all(20),
+              itemCount: _articles.length,
+              itemBuilder: (context, index) {
+                final item = _articles[index];
+                return _ArticleCard(item: item);
+              },
+            ),
     );
   }
 }
@@ -104,7 +110,7 @@ class _ArticleCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xff7b3df0).withValues(alpha:0.3),
+            color: const Color(0xff7b3df0).withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -127,18 +133,24 @@ class _ArticleCard extends StatelessWidget {
                   width: 76,
                   height: 76,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha:0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha:0.3), width: 1),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.3),
+                      width: 1,
+                    ),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: item['image'] != null && item['image'].toString().isNotEmpty
+                    child:
+                        item['image'] != null &&
+                            item['image'].toString().isNotEmpty
                         ? Image.network(
-                      item['image'],
-                      fit: BoxFit.cover,
-                      errorBuilder: (c, e, s) => const Icon(Icons.article, color: Colors.white),
-                    )
+                            item['image'],
+                            fit: BoxFit.cover,
+                            errorBuilder: (c, e, s) =>
+                                const Icon(Icons.article, color: Colors.white),
+                          )
                         : const Icon(Icons.article, color: Colors.white),
                   ),
                 ),
@@ -174,7 +186,11 @@ class _ArticleCard extends StatelessWidget {
                   ),
                 ),
                 // Arrow Icon
-                const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white70),
+                const Icon(
+                  Icons.arrow_forward_ios,
+                  size: 16,
+                  color: Colors.white70,
+                ),
                 const SizedBox(width: 8),
               ],
             ),
@@ -190,7 +206,9 @@ class ArticleDetailScreen extends StatefulWidget {
   final Map<String, dynamic> data;
   final int readTime;
   ArticleDetailScreen({super.key, required this.data, int? readTime})
-      : readTime = readTime ?? (data['full_content'].toString().split(' ').length / 50).ceil();
+    : readTime =
+          readTime ??
+          (data['full_content'].toString().split(' ').length / 50).ceil();
   @override
   State<ArticleDetailScreen> createState() => _ArticleDetailScreenState();
 }
@@ -206,25 +224,39 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   void initState() {
     super.initState();
     _checkIfSaved();
-    String content = widget.data['full_content'] ?? widget.data['fullContent'] ?? "";
-    int estimatedTime = (content.split(' ').length / 150).ceil(); // Adjusted reading speed
+    String content =
+        widget.data['full_content'] ?? widget.data['fullContent'] ?? "";
+    int estimatedTime = (content.split(' ').length / 150)
+        .ceil(); // Adjusted reading speed
     if (estimatedTime < 1) estimatedTime = 1;
     _remainingSeconds = estimatedTime * 60;
     _startTimer();
   }
 
   Future<void> _checkIfSaved() async {
-    bool exists = await DatabaseHelper.instance.isFavorite(widget.data['id'].toString());
+    bool exists = await DatabaseHelper.instance.isFavorite(
+      widget.data['id'].toString(),
+    );
     if (mounted) setState(() => isSaved = exists);
   }
 
   void _toggleFavorite() async {
     if (isSaved) {
-      await DatabaseHelper.instance.removeFavorite(widget.data['id'].toString());
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Removed from offline storage")));
+      await DatabaseHelper.instance.removeFavorite(
+        widget.data['id'].toString(),
+      );
+      if (mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Removed from offline storage")),
+        );
+      }
     } else {
       await DatabaseHelper.instance.addFavorite(widget.data);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Saved for offline reading!")));
+      if (mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Saved for offline reading!")),
+        );
+      }
     }
     setState(() => isSaved = !isSaved);
   }
@@ -250,83 +282,146 @@ class _ArticleDetailScreenState extends State<ArticleDetailScreen> {
   Widget build(BuildContext context) {
     final String title = widget.data['title'] ?? "No Title";
     final String image = widget.data['image'] ?? "";
-    final String content = widget.data['full_content'] ?? widget.data['fullContent'] ?? "No content available.";
+    final String content =
+        widget.data['full_content'] ??
+        widget.data['fullContent'] ??
+        "No content available.";
     final String url = widget.data['url'] ?? "https://google.com";
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: CustomScrollView(slivers: [
-        SliverAppBar(
-          expandedHeight: 250.0,
-          pinned: true,
-          backgroundColor: _brandPurple, // Brand Color
-          flexibleSpace: FlexibleSpaceBar(
-            background: image.isNotEmpty
-                ? Hero(
-              tag: "img_${widget.data['id']}",
-              child: Image.network(
-                image,
-                fit: BoxFit.cover,
-                errorBuilder: (c, e, s) => Container(color: _brandPurple.withValues(alpha:0.5), child: const Icon(Icons.article, size: 50, color: Colors.white)),
-              ),
-            )
-                : Container(color: _brandPurple),
-          ),
-          actions: [
-            IconButton(onPressed: () => Share.share("Read '$title': $url"), icon: const Icon(Icons.share, color: Colors.white)),
-            IconButton(
-              onPressed: _toggleFavorite,
-              icon: Icon(isSaved ? Icons.favorite : Icons.favorite_border, color: isSaved ? Colors.redAccent : Colors.white),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 250.0,
+            pinned: true,
+            backgroundColor: _brandPurple, // Brand Color
+            flexibleSpace: FlexibleSpaceBar(
+              background: image.isNotEmpty
+                  ? Hero(
+                      tag: "img_${widget.data['id']}",
+                      child: Image.network(
+                        image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, e, s) => Container(
+                          color: _brandPurple.withValues(alpha: 0.5),
+                          child: const Icon(
+                            Icons.article,
+                            size: 50,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Container(color: _brandPurple),
             ),
-          ],
-        ),
-        SliverList(
+            actions: [
+              IconButton(
+                onPressed: () => Share.share("Read '$title': $url"),
+                icon: const Icon(Icons.share, color: Colors.white),
+              ),
+              IconButton(
+                onPressed: _toggleFavorite,
+                icon: Icon(
+                  isSaved ? Icons.favorite : Icons.favorite_border,
+                  color: isSaved ? Colors.redAccent : Colors.white,
+                ),
+              ),
+            ],
+          ),
+          SliverList(
             delegate: SliverChildListDelegate([
               Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  // Timer Badge
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: _isTimerRunning ? Colors.orange.shade50 : Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: _isTimerRunning ? Colors.orange.shade200 : Colors.green.shade200),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(_isTimerRunning ? Icons.timer : Icons.check_circle, size: 18, color: _isTimerRunning ? Colors.orange.shade800 : Colors.green),
-                      const SizedBox(width: 8),
-                      Text(
-                        _isTimerRunning
-                            ? "${(_remainingSeconds ~/ 60).toString().padLeft(2, '0')}:${(_remainingSeconds % 60).toString().padLeft(2, '0')} left"
-                            : "Goal Completed!",
-                        style: TextStyle(color: _isTimerRunning ? Colors.orange.shade900 : Colors.green.shade800, fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Timer Badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
-                    ]),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(title, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF2D3436), height: 1.2)),
-                  const SizedBox(height: 20),
-                  Text(content, style: TextStyle(fontSize: 16, height: 1.8, color: Colors.grey.shade800)),
-                  const SizedBox(height: 40),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: () => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication),
-                      icon: const Icon(Icons.public, size: 18),
-                      label: const Text("Open Website"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: _brandPurple,
-                        side: BorderSide(color: _brandPurple),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: _isTimerRunning
+                            ? Colors.orange.shade50
+                            : Colors.green.shade50,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: _isTimerRunning
+                              ? Colors.orange.shade200
+                              : Colors.green.shade200,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _isTimerRunning ? Icons.timer : Icons.check_circle,
+                            size: 18,
+                            color: _isTimerRunning
+                                ? Colors.orange.shade800
+                                : Colors.green,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _isTimerRunning
+                                ? "${(_remainingSeconds ~/ 60).toString().padLeft(2, '0')}:${(_remainingSeconds % 60).toString().padLeft(2, '0')} left"
+                                : "Goal Completed!",
+                            style: TextStyle(
+                              color: _isTimerRunning
+                                  ? Colors.orange.shade900
+                                  : Colors.green.shade800,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                ]),
+                    const SizedBox(height: 16),
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3436),
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.8,
+                        color: Colors.grey.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => launchUrl(
+                          Uri.parse(url),
+                          mode: LaunchMode.externalApplication,
+                        ),
+                        icon: const Icon(Icons.public, size: 18),
+                        label: const Text("Open Website"),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: _brandPurple,
+                          side: BorderSide(color: _brandPurple),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
-            ])),
-      ]),
+            ]),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -359,7 +454,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Offline Favorites", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Offline Favorites",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -371,8 +469,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: FutureBuilder(
         future: _favs,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
-          if (!snapshot.hasData || (snapshot.data as List).isEmpty) return const Center(child: Text("No favorites yet."));
+          if (snapshot.connectionState == ConnectionState.waiting){
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || (snapshot.data as List).isEmpty){
+            return const Center(child: Text("No favorites yet."));
+          }
           final list = snapshot.data as List;
           return ListView.builder(
             padding: const EdgeInsets.all(20),

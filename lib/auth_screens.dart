@@ -89,14 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text.trim(),
       );
-      if (mounted){
+      if (mounted) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const AuthGate()),
         );
       }
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Error: $e")));
@@ -227,7 +227,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         }
       }
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Error: $e")));

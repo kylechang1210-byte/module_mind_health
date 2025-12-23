@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'app_config.dart';       // For isAdmin check
-import 'auth_screens.dart';     // For LoginScreen redirect
-import 'admin_dashboard.dart';  // For Admin Dashboard navigation
+import 'app_config.dart'; // For isAdmin check
+import 'auth_screens.dart'; // For LoginScreen redirect
+import 'admin_dashboard.dart'; // For Admin Dashboard navigation
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -41,11 +41,18 @@ class ProfilePage extends StatelessWidget {
             child: const Text("Cancel"),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: _brandPurple, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _brandPurple,
+              foregroundColor: Colors.white,
+            ),
             onPressed: () async {
               final newPass = passwordCtrl.text.trim();
               if (newPass.length < 6) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password must be at least 6 characters")));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Password must be at least 6 characters"),
+                  ),
+                );
                 return;
               }
 
@@ -58,14 +65,16 @@ class ProfilePage extends StatelessWidget {
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Password updated successfully!")),
+                    const SnackBar(
+                      content: Text("Password updated successfully!"),
+                    ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("Error: $e")),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text("Error: $e")));
                 }
               }
             },
@@ -97,7 +106,9 @@ class ProfilePage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(30),
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: _brandPurple.withValues(alpha: 0.3),
@@ -115,34 +126,58 @@ class ProfilePage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha:0.5), width: 4),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        width: 4,
+                      ),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha:0.1), blurRadius: 10, offset: const Offset(0, 5))
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
                       ],
                     ),
                     child: Center(
                       child: Text(
                         initial,
-                        style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold, color: _brandPurple),
+                        style: TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
+                          color: _brandPurple,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     email,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha:0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withValues(alpha:0.4)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.4),
+                      ),
                     ),
                     child: Text(
                       isAdmin ? "Administrator" : "Member",
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -160,7 +195,13 @@ class ProfilePage extends StatelessWidget {
                       alignment: Alignment.centerLeft,
                       child: Padding(
                         padding: EdgeInsets.only(left: 8, bottom: 10),
-                        child: Text("Management", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          "Management",
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     _ProfileMenuCard(
@@ -168,7 +209,12 @@ class ProfilePage extends StatelessWidget {
                       subtitle: "Manage Users, Content & Tools",
                       icon: Icons.admin_panel_settings,
                       iconColor: Colors.orange,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AdminDashboard())),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AdminDashboard(),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 20),
                   ],
@@ -178,7 +224,13 @@ class ProfilePage extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: Padding(
                       padding: EdgeInsets.only(left: 8, bottom: 10),
-                      child: Text("Account", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        "Account",
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
 
@@ -192,7 +244,6 @@ class ProfilePage extends StatelessWidget {
                   ),
 
                   // I DELETED "NOTIFICATIONS" TO AVOID CONFUSION
-
                   const SizedBox(height: 20),
 
                   // --- DANGER ZONE ---
@@ -205,15 +256,23 @@ class ProfilePage extends StatelessWidget {
                     onTap: () async {
                       await Supabase.instance.client.auth.signOut();
                       if (context.mounted) {
-                        Navigator.of(context, rootNavigator: true).pushReplacement(
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                        Navigator.of(
+                          context,
+                          rootNavigator: true,
+                        ).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
                         );
                       }
                     },
                   ),
 
                   const SizedBox(height: 30),
-                  const Text("Version 1.0.0", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                  const Text(
+                    "Version 1.0.0",
+                    style: TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -249,7 +308,11 @@ class _ProfileMenuCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Material(
@@ -263,7 +326,10 @@ class _ProfileMenuCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: iconColor.withValues(alpha:0.1), shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
                   child: Icon(icon, color: iconColor, size: 24),
                 ),
                 const SizedBox(width: 16),
@@ -273,14 +339,25 @@ class _ProfileMenuCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDestructive ? Colors.red : Colors.black87),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: isDestructive ? Colors.red : Colors.black87,
+                        ),
                       ),
                       const SizedBox(height: 2),
-                      Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                      Text(
+                        subtitle,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      ),
                     ],
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[300]),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: 14,
+                  color: Colors.grey[300],
+                ),
               ],
             ),
           ),

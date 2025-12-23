@@ -28,7 +28,6 @@ class ProgressVisualizationPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Removed search bar
-
               const Text(
                 'Overview',
                 style: TextStyle(
@@ -47,9 +46,7 @@ class ProgressVisualizationPage extends StatelessWidget {
                 onView: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const MoodTrendPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const MoodTrendPage()),
                   );
                 },
               ),
@@ -104,7 +101,7 @@ class _ProgressCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -127,10 +124,7 @@ class _ProgressCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   '“$subtitle”',
-                  style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.white70, fontSize: 12),
                 ),
               ],
             ),
@@ -140,8 +134,7 @@ class _ProgressCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
               foregroundColor: gradientColors.last,
-              padding:
-              const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),

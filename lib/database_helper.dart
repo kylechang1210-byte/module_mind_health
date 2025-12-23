@@ -53,7 +53,11 @@ class DatabaseHelper {
     }
 
     // Use 'replace' so if we save the same article twice, it updates it instead of crashing
-    return await db.insert('favorites', data, conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(
+      'favorites',
+      data,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   Future<int> removeFavorite(String id) async {

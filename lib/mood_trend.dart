@@ -31,10 +31,7 @@ class _MoodTrendPageState extends State<MoodTrendPage> {
       // 1) Local SQLite
       final localRows = await DatabaseMindTrack.instance.getAllCheckIns();
       final local = localRows
-          .map((row) => {
-        ...row,
-        'source': 'local',
-      })
+          .map((row) => {...row, 'source': 'local'})
           .toList();
 
       // 2) Remote Supabase
@@ -47,15 +44,17 @@ class _MoodTrendPageState extends State<MoodTrendPage> {
             .order('date', ascending: true); // oldest first
 
         remote = (data as List)
-            .map<Map<String, dynamic>>((row) => {
-          'id': row['id'],
-          'date': row['date'],
-          'mood': int.tryParse('${row['mood']}') ?? 0,
-          'score': row['score'] ?? 0,
-          'feelings': row['feelings'] ?? '',
-          'notes': row['notes'] ?? '',
-          'source': 'supabase',
-        })
+            .map<Map<String, dynamic>>(
+              (row) => {
+                'id': row['id'],
+                'date': row['date'],
+                'mood': int.tryParse('${row['mood']}') ?? 0,
+                'score': row['score'] ?? 0,
+                'feelings': row['feelings'] ?? '',
+                'notes': row['notes'] ?? '',
+                'source': 'supabase',
+              },
+            )
             .toList();
       } catch (_) {
         // if offline / Supabase error, just use local
@@ -88,9 +87,9 @@ class _MoodTrendPageState extends State<MoodTrendPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load chart data: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to load chart data: $e')));
     }
   }
 
@@ -116,29 +115,29 @@ class _MoodTrendPageState extends State<MoodTrendPage> {
           : _points.isEmpty
           ? const Center(child: Text('No check-ins yet.'))
           : RefreshIndicator(
-        onRefresh: _loadData,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Container(
-              height: 260,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha:0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              onRefresh: _loadData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Container(
+                    height: 260,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: LineChart(_buildLineChartData()),
                   ),
                 ],
               ),
-              child: LineChart(_buildLineChartData()),
             ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -186,10 +185,7 @@ class _MoodTrendPageState extends State<MoodTrendPage> {
               final text = labels[idx] ?? '';
               return Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  text,
-                  style: const TextStyle(fontSize: 9),
-                ),
+                child: Text(text, style: const TextStyle(fontSize: 9)),
               );
             },
           ),

@@ -40,7 +40,10 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error fetching articles: $e"), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text("Error fetching articles: $e"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     }
@@ -51,7 +54,7 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
       await supabase.from('articles').delete().eq('id', id);
       _fetchArticles();
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text("Error: $e")));
@@ -156,7 +159,7 @@ class ArticleManagerTabState extends State<ArticleManagerTab> {
                     }
                     _fetchArticles();
                   } catch (e) {
-                    if (mounted){
+                    if (mounted) {
                       ScaffoldMessenger.of(
                         context,
                       ).showSnackBar(SnackBar(content: Text("Error: $e")));

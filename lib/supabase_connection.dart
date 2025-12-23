@@ -2,7 +2,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class SupabaseConnection {
-  // Use your real project URL + key here
   static const String _supabaseUrl =
       'https://fkjjrvrffecgctsgaeqv.supabase.co';
   static const String _supabaseKey =

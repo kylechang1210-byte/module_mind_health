@@ -13,9 +13,7 @@ Future<void> main() async {
   runApp(
     // 2. Setup Global State Provider (for Therapy Sessions)
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => TherapyModel()),
-      ],
+      providers: [ChangeNotifierProvider(create: (_) => TherapyModel())],
       child: const MindHealthApp(),
     ),
   );

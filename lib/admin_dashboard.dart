@@ -60,7 +60,7 @@ class _AdminDashboardState extends State<AdminDashboard>
       await _supabase.from(table).delete().eq('id', id);
       setState(() {});
     } catch (e) {
-      if (mounted){
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -169,10 +169,10 @@ class _AdminDashboardState extends State<AdminDashboard>
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _fetchData(table),
       builder: (context, snapshot) {
-        if (!snapshot.hasData){
+        if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.data!.isEmpty){
+        if (snapshot.data!.isEmpty) {
           return Center(child: Text("No $table items found."));
         }
 
@@ -227,10 +227,10 @@ class _AdminDashboardState extends State<AdminDashboard>
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _fetchData('history'),
       builder: (context, snapshot) {
-        if (!snapshot.hasData){
+        if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snapshot.data!.isEmpty){
+        if (snapshot.data!.isEmpty) {
           return const Center(child: Text("No logs."));
         }
         return ListView.builder(

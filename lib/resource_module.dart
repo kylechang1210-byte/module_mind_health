@@ -36,7 +36,10 @@ class ResourceHubScreen extends StatelessWidget {
             _ResourceCard(
               title: 'Symptom\nDecoder',
               icon: Icons.accessibility_new_rounded,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SymptomDecoderScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SymptomDecoderScreen()),
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -44,7 +47,10 @@ class ResourceHubScreen extends StatelessWidget {
             _ResourceCard(
               title: 'Crisis\nContacts',
               icon: Icons.phone_in_talk,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CrisisContactsScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CrisisContactsScreen()),
+              ),
             ),
             const SizedBox(height: 16),
 
@@ -52,7 +58,12 @@ class ResourceHubScreen extends StatelessWidget {
             _ResourceCard(
               title: 'Educational\nContent',
               icon: Icons.menu_book,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EducationContentScreen())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const EducationContentScreen(),
+                ),
+              ),
             ),
           ],
         ),
@@ -67,7 +78,11 @@ class _ResourceCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _ResourceCard({required this.title, required this.icon, required this.onTap});
+  const _ResourceCard({
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +111,20 @@ class _ResourceCard extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, height: 1.1),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  height: 1.1,
+                ),
               ),
             ),
             Container(
               padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha:0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                shape: BoxShape.circle,
+              ),
               child: Icon(icon, size: 32, color: Colors.white),
             ),
           ],
@@ -126,7 +149,10 @@ class SymptomDecoderScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF3F6FB),
       appBar: AppBar(
-        title: const Text("Symptom Decoder", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          "Symptom Decoder",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -144,7 +170,11 @@ class SymptomDecoderScreen extends StatelessWidget {
             // Header Text
             const Text(
               "What are you feeling?",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -170,56 +200,64 @@ class _SymptomGrid extends StatelessWidget {
       "label": "Racing Heart",
       "icon": Icons.favorite_border,
       "cause": "Anxiety Spike",
-      "desc": "Your body is in 'Fight or Flight' mode. You need to slow your heart rate down manually.",
+      "desc":
+          "Your body is in 'Fight or Flight' mode. You need to slow your heart rate down manually.",
       "tool": "Start Breathing",
-      "page": BreathingPage()
+      "page": BreathingPage(),
     },
     {
       "label": "Brain Fog",
       "icon": Icons.cloud_outlined,
       "cause": "Overwhelm",
-      "desc": "Your brain is tired of processing input. It needs a gentle, rhythmic reset.",
+      "desc":
+          "Your brain is tired of processing input. It needs a gentle, rhythmic reset.",
       "tool": "Play Healing Music",
-      "page": HealingMusicPage()
+      "page": HealingMusicPage(),
     },
     {
       "label": "Muscle Tension",
       "icon": Icons.accessibility_new,
       "cause": "Chronic Stress",
-      "desc": "We unconsciously hold stress in our shoulders and jaw. Movement releases this.",
+      "desc":
+          "We unconsciously hold stress in our shoulders and jaw. Movement releases this.",
       "tool": "Move Your Body",
-      "page": TherapyDashboard()
+      "page": TherapyDashboard(),
     },
     {
       "label": "Can't Sleep",
       "icon": Icons.bedtime,
       "cause": "Racing Mind",
-      "desc": "Your brain hasn't received a 'safety' signal to shut down for the night.",
+      "desc":
+          "Your brain hasn't received a 'safety' signal to shut down for the night.",
       "tool": "Sleep Sounds",
-      "page": HealingMusicPage()
+      "page": HealingMusicPage(),
     },
     {
       "label": "Shallow Breath",
       "icon": Icons.air,
       "cause": "Panic / Fear",
-      "desc": "Short breaths decrease oxygen and increase panic. Deep breaths reverse this instantly.",
+      "desc":
+          "Short breaths decrease oxygen and increase panic. Deep breaths reverse this instantly.",
       "tool": "Deep Breathing",
-      "page": BreathingPage()
+      "page": BreathingPage(),
     },
     {
       "label": "Restlessness",
       "icon": Icons.directions_run,
       "cause": "Adrenaline",
-      "desc": "You have excess energy from stress. Burn it off with light exercise.",
+      "desc":
+          "You have excess energy from stress. Burn it off with light exercise.",
       "tool": "Exercise Tools",
-      "page": TherapyDashboard()
+      "page": TherapyDashboard(),
     },
   ];
 
   void _showDetail(BuildContext context, Map<String, dynamic> data) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
       builder: (context) => Container(
         padding: const EdgeInsets.all(30),
         child: Column(
@@ -227,15 +265,35 @@ class _SymptomGrid extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: const Color(0xff7b3df0).withValues(alpha:0.1), shape: BoxShape.circle),
-              child: Icon(data['icon'], size: 40, color: const Color(0xff7b3df0)),
+              decoration: BoxDecoration(
+                color: const Color(0xff7b3df0).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                data['icon'],
+                size: 40,
+                color: const Color(0xff7b3df0),
+              ),
             ),
             const SizedBox(height: 20),
-            Text(data['label'], style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+            Text(
+              data['label'],
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
-            Text("Potential Cause: ${data['cause']}", style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            Text(
+              "Potential Cause: ${data['cause']}",
+              style: const TextStyle(
+                color: Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 16),
-            Text(data['desc'], textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, height: 1.5)),
+            Text(
+              data['desc'],
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 16, height: 1.5),
+            ),
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
@@ -244,16 +302,21 @@ class _SymptomGrid extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff7b3df0),
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
                 ),
                 icon: const Icon(Icons.arrow_forward),
                 label: Text(data['tool']),
                 onPressed: () {
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => data['page']));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => data['page']),
+                  );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -284,9 +347,19 @@ class _SymptomGrid extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(s['icon'] as IconData, color: const Color(0xff7b3df0), size: 32),
+                Icon(
+                  s['icon'] as IconData,
+                  color: const Color(0xff7b3df0),
+                  size: 32,
+                ),
                 const SizedBox(height: 12),
-                Text(s['label'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                  s['label'] as String,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
               ],
             ),
           ),
