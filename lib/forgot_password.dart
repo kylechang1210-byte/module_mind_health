@@ -19,9 +19,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _sendResetLink() async {
     final email = _emailCtrl.text.trim();
     if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter your email")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please enter your email")));
       return;
     }
 
@@ -40,7 +40,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           builder: (context) => AlertDialog(
             title: const Text("Check your Inbox"),
             content: Text(
-                "If an account exists for $email, we have sent a password reset link.\n\n(Check your Spam folder too!)"),
+              "If an account exists for $email, we have sent a password reset link.\n\n(Check your Spam folder too!)",
+            ),
             actions: [
               TextButton(
                 onPressed: () {

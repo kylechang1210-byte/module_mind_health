@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'main_mindtrack.dart';    // Tab 1: Tracker
+import 'main_mindtrack.dart'; // Tab 1: Tracker
 import 'therapy_dashboard.dart'; // Tab 2: Therapy Tools
-import 'resource_module.dart';   // Tab 3: Resources
-import 'profile_page.dart';      // Tab 4: Profile (NEW)
+import 'resource_module.dart'; // Tab 3: Resources
+import 'profile_page.dart'; // Tab 4: Profile (NEW)
 
 class HomeNavigator extends StatefulWidget {
   const HomeNavigator({super.key});
@@ -17,18 +17,15 @@ class _HomeNavigatorState extends State<HomeNavigator> {
   // The 4 Main Pages
   final List<Widget> _pages = [
     const MainMindTrackPage(), // Index 0
-    const TherapyDashboard(),  // Index 1
+    const TherapyDashboard(), // Index 1
     const ResourceHubScreen(), // Index 2
-    const ProfilePage(),       // Index 3 (NEW)
+    const ProfilePage(), // Index 3 (NEW)
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
-      ),
+      body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) {
@@ -43,7 +40,10 @@ class _HomeNavigatorState extends State<HomeNavigator> {
           ),
           NavigationDestination(
             icon: Icon(Icons.self_improvement),
-            selectedIcon: Icon(Icons.self_improvement, color: Color(0xFF5C9DFF)),
+            selectedIcon: Icon(
+              Icons.self_improvement,
+              color: Color(0xFF5C9DFF),
+            ),
             label: 'Therapy',
           ),
           NavigationDestination(

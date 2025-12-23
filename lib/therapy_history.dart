@@ -43,7 +43,7 @@ class _TherapyHistoryState extends State<TherapyHistory> {
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: DatabaseMindTrack.instance.getHistory(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting){
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -103,14 +103,12 @@ class _TherapyHistoryState extends State<TherapyHistory> {
   }
 
   Icon _getIcon(String type) {
-    if (type == 'Music'){
+    if (type == 'Music') {
       return const Icon(Icons.music_note, color: Color(0xFF7555FF));
-
     }
     if (type == 'Breathing') return const Icon(Icons.air, color: Colors.blue);
-    if (type == 'Movement'){
+    if (type == 'Movement') {
       return const Icon(Icons.fitness_center, color: Colors.orange);
-
     }
     return const Icon(Icons.check_circle, color: Colors.grey);
   }

@@ -53,10 +53,7 @@ class _JournalingPageState extends State<JournalingPage> {
       ],
     );
 
-    showDialog(
-      context: context,
-      builder: (_) => dialog,
-    );
+    showDialog(context: context, builder: (_) => dialog);
   }
 
   void _showErrorDialog(String message) {
@@ -71,10 +68,7 @@ class _JournalingPageState extends State<JournalingPage> {
       ],
     );
 
-    showDialog(
-      context: context,
-      builder: (_) => dialog,
-    );
+    showDialog(context: context, builder: (_) => dialog);
   }
 
   // ---------- Save (SQLite + Supabase) ----------
@@ -147,9 +141,7 @@ class _JournalingPageState extends State<JournalingPage> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const JournalHistoryPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const JournalHistoryPage()),
               );
             },
           ),
@@ -222,13 +214,12 @@ class _JournalingPageState extends State<JournalingPage> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color:
-                  selected ? const Color(0xFF7ED957) : Colors.white,
+                  color: selected ? const Color(0xFF7ED957) : Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     if (selected)
                       BoxShadow(
-                        color: Colors.black.withValues(alpha:0.08),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -257,8 +248,10 @@ class _JournalingPageState extends State<JournalingPage> {
         hintText: 'e.g. Today is a bad day',
         filled: true,
         fillColor: Colors.white,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -286,8 +279,10 @@ class _JournalingPageState extends State<JournalingPage> {
         alignLabelWithHint: true,
         filled: true,
         fillColor: Colors.white,
-        contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,

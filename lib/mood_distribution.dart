@@ -31,10 +31,7 @@ class _MoodDistributionPageState extends State<MoodDistributionPage> {
       // 1) Local SQLite
       final localRows = await DatabaseMindTrack.instance.getAllCheckIns();
       final local = localRows
-          .map((row) => {
-        ...row,
-        'source': 'local',
-      })
+          .map((row) => {...row, 'source': 'local'})
           .toList();
 
       // 2) Remote Supabase
@@ -47,15 +44,17 @@ class _MoodDistributionPageState extends State<MoodDistributionPage> {
             .order('date', ascending: true);
 
         remote = (data as List)
-            .map<Map<String, dynamic>>((row) => {
-          'id': row['id'],
-          'date': row['date'],
-          'mood': int.tryParse('${row['mood']}') ?? 0,
-          'score': row['score'] ?? 0,
-          'feelings': row['feelings'] ?? '',
-          'notes': row['notes'] ?? '',
-          'source': 'supabase',
-        })
+            .map<Map<String, dynamic>>(
+              (row) => {
+                'id': row['id'],
+                'date': row['date'],
+                'mood': int.tryParse('${row['mood']}') ?? 0,
+                'score': row['score'] ?? 0,
+                'feelings': row['feelings'] ?? '',
+                'notes': row['notes'] ?? '',
+                'source': 'supabase',
+              },
+            )
             .toList();
       } catch (_) {
         // ignore if offline
@@ -118,37 +117,39 @@ class _MoodDistributionPageState extends State<MoodDistributionPage> {
           : _counts.isEmpty
           ? const Center(child: Text('No check-ins yet.'))
           : RefreshIndicator(
-        onRefresh: _loadData,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Container(
-              height: 260,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha:0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+              onRefresh: _loadData,
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Container(
+                    height: 260,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: PieChart(_buildPieChartData()),
                   ),
+                  const SizedBox(height: 16),
+                  _buildLegend(),
                 ],
               ),
-              child: PieChart(_buildPieChartData()),
             ),
-            const SizedBox(height: 16),
-            _buildLegend(),
-          ],
-        ),
-      ),
     );
   }
 
   PieChartData _buildPieChartData() {
-    final total =
-    _counts.values.fold<int>(0, (prev, element) => prev + element);
+    final total = _counts.values.fold<int>(
+      0,
+      (prev, element) => prev + element,
+    );
     final colors = [
       const Color(0xFFEF476F),
       const Color(0xFFF78C6B),
@@ -209,10 +210,7 @@ class _MoodDistributionPageState extends State<MoodDistributionPage> {
               ),
             ),
             const SizedBox(width: 4),
-            Text(
-              moods[i],
-              style: const TextStyle(fontSize: 12),
-            ),
+            Text(moods[i], style: const TextStyle(fontSize: 12)),
           ],
         );
       }),

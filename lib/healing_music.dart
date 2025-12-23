@@ -107,7 +107,7 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseMindTrack.instance.getAllMusic(),
                 builder: (context, snapshot) {
-                  if (!snapshot.hasData){
+                  if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
                   }
                   final songs = snapshot.data!;

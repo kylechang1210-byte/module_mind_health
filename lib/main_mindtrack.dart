@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'daily_checkin.dart';  // Keep this for DailyCheckInPage navigation
+import 'daily_checkin.dart'; // Keep this for DailyCheckInPage navigation
 import 'journal.dart';
 import 'progress_visualization.dart';
-
 
 // Combined MainMindTrackPage from main_mindtrack.dart
 class MainMindTrackPage extends StatelessWidget {
   const MainMindTrackPage({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -56,8 +54,11 @@ class MainMindTrackPage extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const ProgressVisualizationPage()),
-                );              },
+                  MaterialPageRoute(
+                    builder: (_) => const ProgressVisualizationPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -66,13 +67,11 @@ class MainMindTrackPage extends StatelessWidget {
   }
 }
 
-
 // Combined MindCard widget from main_mindtrack.dart
 class MindCard extends StatelessWidget {
   final String title;
   final IconData icon;
   final VoidCallback onTap;
-
 
   const MindCard({
     super.key,
@@ -80,7 +79,6 @@ class MindCard extends StatelessWidget {
     required this.icon,
     required this.onTap,
   });
-
 
   @override
   Widget build(BuildContext context) {
@@ -117,19 +115,15 @@ class MindCard extends StatelessWidget {
   }
 }
 
-
 // Optional: Remove this unused class if not needed
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
 
-
   final String title;
-
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
-
 
 class _MyHomePageState extends State<MyHomePage> {
   @override

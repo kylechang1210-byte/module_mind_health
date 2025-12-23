@@ -24,7 +24,6 @@ class TherapyDashboard extends StatelessWidget {
           '/breathing': (context) => const BreathingPage(),
           '/movement': (context) => const MovementPage(),
           '/therapy_history': (context) => const TherapyHistory(),
-          //'/admin': (context) => const TherapyAdmin(),
         },
       ),
     );
@@ -55,7 +54,7 @@ class TherapyPage extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Tool 1: Music
+              // Music
               _buildTherapyCard(
                 context: context,
                 title: 'Healing\nMusic',
@@ -64,7 +63,7 @@ class TherapyPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Tool 2: Breathing
+              // Breathing
               _buildTherapyCard(
                 context: context,
                 title: 'Breathing\nExercise',
@@ -73,7 +72,7 @@ class TherapyPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
 
-              // Tool 3: Movement
+              // Movement
               _buildTherapyCard(
                 context: context,
                 title: 'Mindful\nMovement',
@@ -109,7 +108,6 @@ class TherapyPage extends StatelessWidget {
         height: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          // Updated gradient to match MainMindTrackPage colors
           gradient: const LinearGradient(
             colors: [Color(0xff7b3df0), Color(0xff5fc3ff)],
             begin: Alignment.topLeft,
