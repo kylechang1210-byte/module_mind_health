@@ -30,12 +30,12 @@ class JournalDetailPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F7FB),
+        backgroundColor: const Color(0xFF6D5DF6),
         elevation: 0,
         title: const Text(
           'Journal Detail',
           style: TextStyle(
-            color: Color(0xFF6D5DF6),
+            color: Color(0xFFF4F7FB),
             fontWeight: FontWeight.bold,
           ),
         ),

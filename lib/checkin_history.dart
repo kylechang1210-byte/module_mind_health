@@ -39,16 +39,8 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     try {
       // 1. Local SQLite
       final localRows = await DatabaseMindTrack.instance.getAllCheckIns();
-      final local = localRows
-          .map(
-            (row) => {
-              ...row,
-              'source': 'local', // mark source
-            },
-          )
-          .toList();
 
-      // 2. Remote Supabase (safe to wrap in try so offline still works)
+      // 2. Remote Supabase (priority)
       List<Map<String, dynamic>> remote = [];
       try {
         final supabase = SupabaseConnection.client;
@@ -57,41 +49,49 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
             .select()
             .order('date', ascending: false);
 
-        remote = (data as List)
-            .map<Map<String, dynamic>>(
-              (row) => {
-                'id': row['id'],
-                'date': row['date'],
-                'mood': int.tryParse('${row['mood']}') ?? 0,
-                'score': row['score'] ?? 0,
-                'feelings': row['feelings'] ?? '',
-                'notes': row['notes'] ?? '',
-                'source': 'supabase',
-              },
-            )
-            .toList();
+        remote = (data as List).map<Map<String, dynamic>>((row) => {
+          'id': row['id'],
+          'date': row['date'],
+          'mood': int.tryParse('${row['mood']}') ?? 0,
+          'score': row['score'] ?? 0,
+          'feelings': row['feelings'] ?? '',
+          'notes': row['notes'] ?? '',
+        }).toList();
       } catch (_) {
-        // if Supabase fails (offline), just show local
+        // Offline? Use local only
       }
 
-      // 3. Merge. Simple concat; you can add smarter de-dup later.
-      final merged = <Map<String, dynamic>>[...local, ...remote];
+      // 3. MERGE: Supabase wins, local fills gaps (NO DUPLICATES)
+      final Map<String, Map<String, dynamic>> uniqueByDate = {};
+
+      // Supabase FIRST (most authoritative)
+      for (final row in remote) {
+        final dateKey = formatSupabaseDate(row['date']);
+        uniqueByDate[dateKey] = row;
+      }
+
+      // Local ONLY for dates NOT in Supabase
+      for (final row in localRows) {
+        final dateKey = DateFormat('yyyy-MM-dd').format(DateTime.parse(row['date']));
+        if (!uniqueByDate.containsKey(dateKey)) {
+          uniqueByDate[dateKey] = row;
+        }
+      }
 
       if (!mounted) return;
       setState(() {
-        items = merged;
+        items = uniqueByDate.values.toList();
       });
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to load check-ins: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load: $e')),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // ================== DELETE FROM BOTH ==================
 
   Future<void> _deleteCheckIn(Map<String, dynamic> row) async {
     final int id = row['id'] as int;
@@ -149,12 +149,12 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F7FB),
+        backgroundColor: const Color(0xFF6D5DF6),
         elevation: 0,
         title: const Text(
           'Check-In History',
           style: TextStyle(
-            color: Color(0xFF6D5DF6),
+            color: Color(0xFFFFFFFF),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -186,7 +186,6 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
     final int score = row['score'] ?? 0;
     final String feelings = row['feelings'] ?? '';
     final int moodIndex = row['mood'] ?? 0;
-    final String source = row['source'] as String? ?? 'local';
 
     const moods = ['Terrible', 'Meh', 'Fine', 'Good', 'Great'];
     final moodText = (moodIndex >= 0 && moodIndex < moods.length)
@@ -260,13 +259,6 @@ class _CheckInHistoryPageState extends State<CheckInHistoryPage> {
           ),
           const SizedBox(height: 4),
 
-          // source label (optional)
-          Text(
-            'Source: ${source == 'local' ? 'SQLite' : 'Supabase'}',
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
-          ),
-
-          const SizedBox(height: 8),
 
           // Detail button
           Align(

@@ -133,7 +133,7 @@ class _JournalingPageState extends State<JournalingPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F7FB),
+        backgroundColor: const Color(0xFF1A7FFF),
         elevation: 0,
         actions: [
           IconButton(

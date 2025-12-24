@@ -38,11 +38,8 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
     try {
       // 1) Local SQLite
       final localRows = await DatabaseMindTrack.instance.getAllJournals();
-      final local = localRows
-          .map((row) => {...row, 'source': 'local'})
-          .toList();
 
-      // 2) Remote Supabase
+      // 2) Remote Supabase (priority)
       List<Map<String, dynamic>> remote = [];
       try {
         final supabase = SupabaseConnection.client;
@@ -51,41 +48,38 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
             .select()
             .order('date', ascending: false);
 
-        remote = (data as List)
-            .map<Map<String, dynamic>>(
-              (row) => {
-                'id': row['id'],
-                'date': row['date'],
-                'title': row['title'] ?? '',
-                'mood': row['mood'] ?? '',
-                'content': row['content'] ?? '',
-                'source': 'supabase',
-              },
-            )
-            .toList();
+        remote = (data as List).map<Map<String, dynamic>>((row) => {
+          'id': row['id'],
+          'date': row['date'],
+          'title': row['title'] ?? '',
+          'mood': row['mood'] ?? '',
+          'content': row['content'] ?? '',
+        }).toList();
       } catch (_) {
-        // if remote fails (offline), just keep local
+        // Offline? Use local only
       }
 
-      // 3) Merge + de‑duplicate by id, prefer Supabase over local
-      final Map<String, Map<String, dynamic>> uniqueById = {};
+      // 3) MERGE: Supabase wins, local fills gaps (NO DUPLICATES)
+      final Map<String, Map<String, dynamic>> uniqueByDate = {};
 
-      for (final row in local) {
-        final idKey = '${row['id']}';
-        uniqueById[idKey] = row; // local baseline
-      }
-
+      // Supabase FIRST (most authoritative)
       for (final row in remote) {
-        final idKey = '${row['id']}';
-        // if remote exists, overwrite local
-        uniqueById[idKey] = row;
+        final dateKey = formatJournalDate(row['date']);
+        uniqueByDate[dateKey] = row;
       }
 
-      final merged = uniqueById.values.toList()
+      // Local ONLY for dates NOT in Supabase
+      for (final row in localRows) {
+        final dateKey = formatJournalDate(row['date']);
+        if (!uniqueByDate.containsKey(dateKey)) {
+          uniqueByDate[dateKey] = row;
+        }
+      }
+
+      final merged = uniqueByDate.values.toList()
         ..sort((a, b) {
-          // optional: sort by date desc after merge
-          final ad = (a['date'] ?? '').toString();
-          final bd = (b['date'] ?? '').toString();
+          final ad = formatJournalDate(a['date']);
+          final bd = formatJournalDate(b['date']);
           return bd.compareTo(ad);
         });
 
@@ -93,13 +87,14 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
       setState(() => _journals = merged);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Failed to load journals: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load: $e')),
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
 
   Future<void> _deleteJournal(Map<String, dynamic> row) async {
     final int id = row['id'] as int;
@@ -153,12 +148,12 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4F7FB),
+        backgroundColor: const Color(0xFF6D5DF6),
         elevation: 0,
         title: const Text(
           'Journal History',
           style: TextStyle(
-            color: Color(0xFF6D5DF6),
+            color: Color(0xFFF4F7FB),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -190,7 +185,6 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
 
     final String title = data['title'] ?? '';
     final String mood = data['mood'] ?? '';
-    final String source = data['source'] as String? ?? 'local';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -258,14 +252,6 @@ class _JournalHistoryPageState extends State<JournalHistoryPage> {
             ),
           ),
           const SizedBox(height: 4),
-
-          // source label (optional)
-          Text(
-            'Source: ${source == 'local' ? 'SQLite' : 'Supabase'}',
-            style: const TextStyle(color: Colors.white70, fontSize: 11),
-          ),
-
-          const SizedBox(height: 8),
 
           Align(
             alignment: Alignment.bottomRight,
