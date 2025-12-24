@@ -22,15 +22,11 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
   }
 
   void _toggleMusic(int id, String path, String title) async {
-    debugPrint("🎵 User clicked: $title");
-    debugPrint("📂 Original Path from DB: $path");
-
     try {
       if (_playingId == id) {
         // STOP Logic
         await _audioPlayer.stop();
         setState(() => _playingId = -1);
-        debugPrint("⏹️ Music Stopped");
       } else {
         // PLAY Logic
         await _audioPlayer.stop(); // Stop previous song if any
@@ -39,9 +35,6 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
         if (path.startsWith('assets/')) {
           cleanPath = path.substring(7);
         }
-
-        debugPrint("▶️ Playing clean path: $cleanPath");
-
         // Set source and play
         await _audioPlayer.play(AssetSource(cleanPath));
 
@@ -55,7 +48,6 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
         ).recordSession('Music: $title');
       }
     } catch (e) {
-      debugPrint("❌ AUDIO ERROR: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -201,7 +193,6 @@ class _HealingMusicPageState extends State<HealingMusicPage> {
                 iconSize: 32,
                 onPressed: () {
                   _audioPlayer.pause();
-                  // Note: Pausing keeps the playing ID so the border stays purple
                 },
               ),
             ],
